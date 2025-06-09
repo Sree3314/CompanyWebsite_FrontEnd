@@ -1,3 +1,26 @@
+// src/app/app.routes.ts
 import { Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component'; // Make sure to import HomeComponent
+import { FAQComponent } from './faq/faq.component';
+import { JobPortalComponent } from './job-portal/job-portal.component';
+import { ExhibitionComponent } from './exhibition/exhibition.component';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+  // This is the missing route that fixes the loop!
+  { path: 'home', component: HomeComponent },
+
+  { path: 'faq', component: FAQComponent },
+  { path: 'job-portal', component: JobPortalComponent },
+  { path: 'exhibition', component: ExhibitionComponent },
+  // Assuming 'signin' is a placeholder or you have a SigninComponent
+  // { path: 'signin', component: SigninComponent },
+  // OR for lazy loading (if you implemented it this way):
+  // { path: 'signin', loadComponent: () => import('./path-to-your-signin-component/signin.component').then(m => m.SigninComponent) },
+
+
+  // Redirect to the home path when the URL is empty
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+
+  // Redirect any unknown paths to the home path (this is now safe because /home is defined)
+  { path: '**', redirectTo: '/home' }
+];
