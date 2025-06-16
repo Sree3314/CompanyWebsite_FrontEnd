@@ -1,0 +1,33 @@
+/* src/app/faq/faq.component.css */
+
+/* Component specific styles, mostly for overrides or unique elements */
+/* Tailwind CSS classes are heavily used directly in the HTML template. */
+
+.faq-container {
+    background-color: #f7f9fc; /* Light blue-gray for the container */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 900px; /* Constrain width for readability */
+    margin: 40px auto; /* Center the container */
+    padding-bottom: 20px; /* Add some padding at the bottom */
+}
+
+h2, h3 {
+    font-family: 'Inter', sans-serif; /* Use Inter for consistency with general app theme */
+}
+
+/* Question Card Styles */
+.question-card {
+    border-left: 5px solid #3b82f6; /* Blue border for emphasis */
+}
+
+/* Answer Card Styles */
+.answer-card {
+    border: 1px solid #e0e7ff; /* Lighter blue border for answers */
+}
+
+/* User Profile Image Fallback (if no actual image is provided) */
+img[src="https://placehold.co/50x50/cccccc/000000?text=User"],
+img[src="https://placehold.co/40x40/cccccc/000000?text=User"] {
+  border: 1px solid #ddd;
+}

@@ -1,0 +1,49 @@
+<!-- src/app/components/dashboard/dashboard.component.html -->
+
+<div class="dashboard-container p-6 bg-gray-100 min-h-screen flex flex-col items-center justify-center font-inter rounded-lg shadow-lg">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
+      <h2 class="text-3xl font-bold text-indigo-700 mb-6">Welcome to your Dashboard!</h2>
+  
+      <div *ngIf="userDetails; else loading" class="text-left space-y-3">
+        <p class="text-lg text-gray-800">
+          <strong class="text-indigo-600">Employee ID:</strong> {{ userDetails.employeeId }}
+        </p>
+        <p class="text-lg text-gray-800">
+          <strong class="text-indigo-600">Email:</strong> {{ userDetails.email }}
+        </p>
+        <p class="text-lg text-gray-800">
+          <strong class="text-indigo-600">First Name:</strong> {{ userDetails.firstName }}
+        </p>
+        <p class="text-lg text-gray-800">
+          <strong class="text-indigo-600">Last Name:</strong> {{ userDetails.lastName }}
+        </p>
+        <p class="text-lg text-gray-800">
+          <strong class="text-indigo-600">Contact:</strong> {{ userDetails.contactInformation }}
+        </p>
+        <p class="text-lg text-gray-800">
+          <strong class="text-indigo-600">Department:</strong> {{ userDetails.department }}
+        </p>
+        <p class="text-lg text-gray-800">
+          <strong class="text-indigo-600">Job Title:</strong> {{ userDetails.jobTitle }}
+        </p>
+        <p *ngIf="userDetails.profilePictureUrl" class="text-lg text-gray-800">
+          <strong class="text-indigo-600">Profile Picture:</strong>
+          <img [src]="userDetails.profilePictureUrl" alt="Profile" class="w-24 h-24 rounded-full mx-auto mt-2 object-cover shadow-md">
+        </p>
+      </div>
+  
+      <ng-template #loading>
+        <p *ngIf="!errorMessage" class="text-gray-600">Loading user details...</p>
+        <p *ngIf="errorMessage" class="error-message text-red-600 font-medium">{{ errorMessage }}</p>
+      </ng-template>
+  
+      <button (click)="logout()"
+              class="mt-8 px-6 py-3 bg-red-600 text-white font-semibold rounded-full shadow-md hover:bg-red-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75">
+        Logout
+      </button>
+    </div>
+  </div>
+  
+  <!-- Tailwind CSS CDN (add this to your index.html if not already configured) -->
+  <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+  

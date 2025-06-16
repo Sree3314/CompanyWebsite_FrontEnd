@@ -1,0 +1,63 @@
+<div class="form-container">
+    <!-- Sign In Form -->
+    <div *ngIf="!showSignUpForm">
+      <h2>Sign In</h2>
+      <form (ngSubmit)="onSignIn()">
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" [(ngModel)]="signInData.email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" [(ngModel)]="signInData.password" required>
+        </div>
+        <button type="submit" (click)="onSignIn()">Sign In</button>
+      </form>
+      <p>Don't have an account? <button (click)="toggleForm()">Create Account</button></p>
+    </div>
+  
+    <!-- Sign Up Form -->
+    <div *ngIf="showSignUpForm">
+      <h2>Sign Up</h2>
+      <form (ngSubmit)="onSignUp()">
+        <div class="form-group">
+          <label for="employeeId">Employee ID:</label>
+          <input type="text" id="employeeId" name="employeeId" [(ngModel)]="signUpData.employeeId" required>
+        </div>
+        <div class="form-group">
+          <label for="firstName">First Name:</label>
+          <input type="text" id="firstName" name="firstName" [(ngModel)]="signUpData.firstName" required>
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name:</label>
+          <input type="text" id="lastName" name="lastName" [(ngModel)]="signUpData.lastName" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" [(ngModel)]="signUpData.email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" [(ngModel)]="signUpData.password" required>
+        </div>
+        <div class="form-group">
+          <label for="contactInformation">Contact Information:</label>
+          <input type="text" id="contactInformation" name="contactInformation" [(ngModel)]="signUpData.contactInformation" required>
+        </div>
+        <div class="form-group">
+          <label for="department">Department:</label>
+          <input type="text" id="department" name="department" [(ngModel)]="signUpData.department" required>
+        </div>
+        <div class="form-group">
+          <label for="jobTitle">Job Title:</label>
+          <input type="text" id="jobTitle" name="jobTitle" [(ngModel)]="signUpData.jobTitle" required>
+        </div>
+        <div class="form-group">
+          <label for="personalEmail">Personal Email:</label>
+          <input type="email" id="personalEmail" name="personalEmail" [(ngModel)]="signUpData.personalEmail" required>
+        </div>
+        <button type="submit" click()="onSignUp()">Sign Up</button>
+        <p>Already have an account? <button (click)="toggleForm()">Sign In</button></p>
+      </form>
+    </div>
+  </div>
