@@ -1,22 +1,30 @@
-<div class="app-container"> <header class="header">
-  <div class="logo-section">
-    <img src="assets/company-logo.png" alt="Company Logo" class="company-logo">
-    <h1 class="company-name">Your Company Name</h1>
-  </div>
-  <nav class="navigation">
-    <a routerLink="/home" class="nav-link">Home</a> 
-    <a routerLink="/faq" class="nav-link">FAQ</a>
-    <a routerLink="/job-portal" class="nav-link">Job Portal</a>
-    <a routerLink="/exhibition" class="nav-link">Exhibition</a>
-    <a routerLink="/signin_signup" class="nav-link ">Sign In/Sign Up</a>
-  </nav>
-</header>
+<div class="app-container">
+  <header class="header">
+    <div class="logo-section">
+      <img src="assets/company-logo.png" alt="Company Logo" class="company-logo">
+      <h1 class="company-name">Your Company Name</h1>
+    </div>
+    <nav class="navigation">
+      <a routerLink="/home" class="nav-link">Home</a>
+      <a routerLink="/faq" class="nav-link">FAQ</a>
+      <a routerLink="/job-portal" class="nav-link">Job Portal</a>
+      <a routerLink="/exhibition" class="nav-link">Exhibition</a>
 
-<main class="main-content">
-  <router-outlet></router-outlet>
-</main>
+      <ng-container *ngIf="!isLoggedIn; else profileLink">
+        <a routerLink="/signin_signup" class="nav-link">Sign In/Sign Up</a>
+      </ng-container>
+      <ng-template #profileLink>
+        <a routerLink="/dashboard" class="nav-link">Your Profile</a>
+      </ng-template>
 
-<footer class="footer">
-  <p>&copy; 2025 Your Company Name. All rights reserved.</p>
-</footer>
+    </nav>
+  </header>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2025 Your Company Name. All rights reserved.</p>
+  </footer>
 </div>

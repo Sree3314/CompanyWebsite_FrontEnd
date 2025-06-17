@@ -13,9 +13,10 @@ export interface UserProfileResponse {
   contactInformation: string;
   department: string;
   jobTitle: string;
-  profilePictureUrl?: string; // Optional field
+  profilePictureUrl: string; // Optional field
   // Add other properties if your DTO has them
 }
+
 
 @Injectable({
   providedIn: 'root'
@@ -33,4 +34,8 @@ export class UserService {
   getUserProfile(): Observable<UserProfileResponse> {
     return this.http.get<UserProfileResponse>(`${this.apiUrl}/me`);
   }
-}
+    updateUserProfile(userProfile: UserProfileResponse): Observable<UserProfileResponse> {
+      // The backend expects a PUT request to /api/users/me
+      return this.http.put<UserProfileResponse>(`${this.apiUrl}/me`, userProfile);
+    }
+  }

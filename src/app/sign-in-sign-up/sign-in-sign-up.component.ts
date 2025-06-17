@@ -1,26 +1,31 @@
-// src/app/sign-in-sign-up/sign-in-sign-up.component.ts
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; // Import Router
-import { AuthService } from '../services/auth.service'; // Import AuthService
+import { FormsModule } from '@angular/forms';
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
+
+import { SignInRequest, SignUpRequest, ResetPasswordRequest, MessageResponse } from '../models/auth.model'; // Import new interfaces
 
 @Component({
-  selector: 'app-sign-in-sign-up',
+  selector: 'app-signin-signup',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './sign-in-sign-up.component.html',
-  styleUrls: ['./sign-in-sign-up.component.css'],
-  imports: [CommonModule, FormsModule], // Import CommonModule and FormsModule for template directives
-  // Make sure CommonModule and FormsModule are imported for template directives
-  // These are often imported at the AppModule level if components are not standalone.
-  // If this component were standalone, you'd add: imports: [CommonModule, FormsModule]
-  // Since it's declared in AppModule, it gets them from there.
+  styleUrls: ['./sign-in-sign-up.component.css']
 })
-export class SignInSignUpComponent {
-  showSignUpForm = false;
+export class SignInSignUpComponent implements OnInit {
+  // Form State Variables
+  showSignUpForm: boolean = false;
+  showForgotPasswordForm: boolean = false;
+  showResetPasswordForm: boolean = false; // To show the form for OTP & New Password
 
-  // Form data objects
-  signInData = { email: '', password: '' };
-  signUpData = {
+  // Data Models for Forms
+  signInData: SignInRequest = {
+    email: '',
+    password: ''
+  };
+
+  signUpData: SignUpRequest = {
     employeeId: '',
     firstName: '',
     lastName: '',
@@ -32,49 +37,160 @@ export class SignInSignUpComponent {
     personalEmail: ''
   };
 
-  // Inject Router and AuthService
+  forgotPasswordEmail: string = ''; // For the "forgot password" email input
+  resetPasswordData: ResetPasswordRequest = { // For the "reset password" form
+    organizationEmail: '',
+    token: '', // This will be the OTP
+    newPassword: ''
+  };
+
+  // Message Handling
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
+
   constructor(
-    private router: Router, // Inject Router
-    private authService: AuthService // Inject AuthService
-  ) {}
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
-  // Toggle between SignIn and SignUp forms
-  toggleForm() {
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
+  /**
+   * Toggles between sign-in and sign-up forms.
+   * Resets other form states.
+   */
+  toggleForm(): void {
     this.showSignUpForm = !this.showSignUpForm;
+    this.showForgotPasswordForm = false; // Hide forgot password form
+    this.showResetPasswordForm = false; // Hide reset password form
+    this.clearMessages();
   }
 
-  onSignIn() {
-    console.log('Sending sign-in request:', this.signInData);
-    this.authService.signIn(this.signInData).subscribe(
-      (response) => {
-        console.log('SignIn successful:', response);
-        console.log('SignIn successful! Navigating to dashboard...');
-        // Navigate to the dashboard or home page after successful login
-        this.router.navigate(['/dashboard']);
+  /**
+   * Navigates to the forgot password flow.
+   * Resets other form states.
+   */
+  goToForgotPassword(): void {
+    this.showSignUpForm = false;
+    this.showForgotPasswordForm = true;
+    this.showResetPasswordForm = false;
+    this.clearMessages();
+    this.forgotPasswordEmail = ''; // Clear previous email
+  }
+
+  /**
+   * Back to sign in form from any other form.
+   */
+  backToSignIn(): void {
+    this.showSignUpForm = false;
+    this.showForgotPasswordForm = false;
+    this.showResetPasswordForm = false;
+    this.clearMessages();
+  }
+
+  onSignIn(): void {
+    this.clearMessages();
+    this.authService.signIn(this.signInData).subscribe({
+      next: (response) => {
+        this.successMessage = 'Sign in successful! Redirecting to dashboard...';
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 1000);
       },
-      (error) => {
-        console.error('SignIn failed:', error);
-        console.error('SignIn failed. Please check your credentials.');
-        // Potentially display a user-friendly error message on the UI
+      error: (error) => {
+        console.error('Sign in failed:', error);
+        // Backend now returns JSON { "error": "message" }
+        this.errorMessage = error.error?.error || 'Sign in failed. Please check your credentials.';
+        this.successMessage = null;
       }
-    );
+    });
   }
 
-  onSignUp() {
-    console.log('Sending sign-up request:', this.signUpData);
-    this.authService.signUp(this.signUpData).subscribe(
-      (response) => {
+  onSignUp(): void {
+    this.clearMessages();
+    this.authService.signUp(this.signUpData).subscribe({
+      next: (response: MessageResponse) => { // Expecting MessageResponse
         console.log('SignUp successful:', response);
-        console.log('SignUp successful!');
-        // Optionally, redirect to sign-in page after successful signup
-        this.toggleForm(); // Switch back to sign-in form
-        // Or you might auto-login the user after signup, depending on your flow
+        // Use response.message for alert
+        window.alert(response.message || 'Account created successfully!');
+
+        this.showSignUpForm = false;
+        this.signInData.email = response.email || this.signUpData.email; // Pre-fill email from response or input
+        this.signInData.password = '';
+        this.clearMessages();
       },
-      (error) => {
-        console.error('SignUp failed:', error);
-        console.error('SignUp failed. Please try again.');
-        // Potentially display a user-friendly error message on the UI
+      error: (error) => {
+        console.error('Sign up failed:', error);
+        // Backend now returns JSON { "error": "message" }
+        this.errorMessage = error.error?.error || 'Sign up failed. Please try again.';
+        this.successMessage = null;
       }
-    );
+    });
+  }
+
+  /**
+   * Handles the request to send OTP for password reset.
+   */
+  onRequestOtp(): void {
+    this.clearMessages();
+    if (!this.forgotPasswordEmail) {
+      this.errorMessage = 'Please enter your personal email.';
+      return;
+    }
+    console.log('Requesting OTP for:', this.forgotPasswordEmail);
+    this.authService.forgotPassword(this.forgotPasswordEmail).subscribe({
+      next: (response: MessageResponse) => { // Expecting MessageResponse
+        console.log('OTP request successful:', response);
+        this.successMessage = response.message || 'OTP sent to your personal email.';
+        // Pre-fill organization email for reset form (if it's the same)
+        this.resetPasswordData.organizationEmail = this.forgotPasswordEmail;
+        this.showForgotPasswordForm = false; // Hide forgot password form
+        this.showResetPasswordForm = true; // Show reset password form
+        this.forgotPasswordEmail = ''; // Clear email input
+      },
+      error: (error) => {
+        console.error('OTP request failed:', error);
+        // Backend now returns JSON { "error": "message" }
+        this.errorMessage = error.error?.error || 'Failed to send OTP. Please check your email.';
+        this.successMessage = null;
+      }
+    });
+  }
+
+  /**
+   * Handles the password reset submission (with OTP and new password).
+   */
+  onResetPassword(): void {
+    this.clearMessages();
+    if (!this.resetPasswordData.organizationEmail || !this.resetPasswordData.token || !this.resetPasswordData.newPassword) {
+      this.errorMessage = 'All fields are required.';
+      return;
+    }
+    console.log('Attempting to reset password for:', this.resetPasswordData.organizationEmail);
+    this.authService.resetPassword(this.resetPasswordData).subscribe({
+      next: (response: MessageResponse) => { // Expecting MessageResponse
+        console.log('Password reset successful:', response);
+        this.successMessage = response.message || 'Password reset successfully.';
+        // After successful reset, go back to sign-in form
+        this.resetPasswordData = { organizationEmail: '', token: '', newPassword: '' }; // Clear data
+        this.showResetPasswordForm = false;
+        this.backToSignIn(); // Navigate back to the sign-in form
+      },
+      error: (error) => {
+        console.error('Password reset failed:', error);
+        // Backend now returns JSON { "error": "message" }
+        this.errorMessage = error.error?.error || 'Password reset failed. Please check OTP or try again.';
+        this.successMessage = null;
+      }
+    });
+  }
+
+  private clearMessages(): void {
+    this.errorMessage = null;
+    this.successMessage = null;
   }
 }

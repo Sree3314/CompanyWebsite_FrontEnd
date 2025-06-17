@@ -1,45 +1,23 @@
-// src/app/app.module.ts
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common'; // For ngIf, ngFor etc.
-import { FormsModule } from '@angular/forms'; // For ngModel
-
-// Components that are NOT standalone must be declared here
-import { AppComponent } from './app.component'; // AppComponent is standalone, but might be here for other reasons
-import { FAQComponent } from './faq/faq.component'; // Import FAQComponent (now standalone)
+import { RouterModule, Routes } from '@angular/router';
+import { FAQComponent } from './faq/faq.component';
 import { JobPortalComponent } from './job-portal/job-portal.component';
 import { ExhibitionComponent } from './exhibition/exhibition.component';
-import { SignInSignUpComponent } from './sign-in-sign-up/sign-in-sign-up.component';
-import { HomeComponent } from './home/home.component'; // Assuming HomeComponent is not standalone
+import { AppComponent } from './app.component'; // Assuming AppComponent is your homepage
 
-// Components that ARE standalone must be imported here
-import { DashboardComponent } from './dashboard/dashboard.component'; // Assuming the file is dashboard.component.ts
+// Define your routes
+const routes: Routes = [
+  { path: 'faq', component: FAQComponent },
+  { path: 'job-portal', component: JobPortalComponent },
+  { path: 'exhibition', component: ExhibitionComponent },
+  { path: 'home', component: AppComponent }, // Route for your main homepage
+  { path: '', redirectTo: '/home', pathMatch: 'full' }, // Default route redirects to home
+  // You might want to add a 404 Not Found page for any unmatched routes
+  // { path: '**', component: NotFoundComponent }
+];
 
 @NgModule({
-  declarations: [
-    // Remove FAQComponent from declarations since it's now standalone
-    // AppComponent, // AppComponent is standalone and bootstrapped in main.ts
-    // FAQComponent, // REMOVE THIS LINE
-    JobPortalComponent,
-    ExhibitionComponent,
-    SignInSignUpComponent,
-    HomeComponent // Declare HomeComponent if it's not standalone
-  ],
-  imports: [
-    BrowserModule,
-    CommonModule, // Required for common Angular directives like *ngIf, *ngFor
-    FormsModule,  // Required for ngModel and form handling
-    DashboardComponent, // Import DashboardComponent here because it's marked as `standalone: true`
-    FAQComponent // IMPORTANT: Import FAQComponent here because it's now standalone
-    // Removed AppRoutingModule and RouterModule.forRoot(routes) as routing is now handled by app.config.ts
-  ],
-  providers: [
-    // Removed provideHttpClient() here as it's handled by `app.config.ts`
-    // Removed HTTP_INTERCEPTORS here as interceptors are provided via `withInterceptors` in `app.config.ts`
-  ],
-  // If AppComponent is truly standalone and bootstrapped directly,
-  // then bootstrap: [AppComponent] might not be needed in AppModule,
-  // but keeping it if there's a specific reason for this hybrid setup.
-  bootstrap: [AppComponent]
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
 })
-export class AppModule { }
+export class AppRoutingModule { }
