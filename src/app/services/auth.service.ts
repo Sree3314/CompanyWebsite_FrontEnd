@@ -1,95 +1,97 @@
-// src/app/services/auth.service.ts
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common'; // Import isPlatformBrowser
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, tap } from 'rxjs'; // Import 'of' from 'rxjs'
+import { Observable, of, tap, BehaviorSubject } from 'rxjs';
+import { Router } from '@angular/router';
 
-// Define interfaces for your sign-in/sign-up requests and responses
-interface SignInRequest {
-  email: string;
-  password: string;
-}
-
-interface SignInResponse {
-  jwtToken: string;
-  email: string;
-  roles: string[]; // Assuming your backend returns roles
-  // Add other fields if your backend login response includes them, e.g., firstName, lastName
-}
-
-interface SignUpRequest {
-  employeeId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  contactInformation: string;
-  department: string;
-  jobTitle: string;
-  personalEmail: string;
-}
+import { SignInRequest, SignInResponse, SignUpRequest ,MessageResponse,ResetPasswordRequest} from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private signUpUrl = 'http://localhost:8089/api/auth/register';
-  private signInUrl = 'http://localhost:8089/api/auth/login';
+  private readonly TOKEN_KEY = 'jwtToken';
+  private apiUrl = 'http://localhost:8089/api/auth'; // Base URL for your auth API
 
-  // These will hold the current user's details for use across the application
-  // Initialize with null/empty for no logged-in user
+  // BehaviorSubject to hold and broadcast the current login status
+  // It's initialized in the constructor after PLATFORM_ID is available.
+  private _isLoggedIn$: BehaviorSubject<boolean>;
+  isLoggedIn$: Observable<boolean>; // Public observable for other components to subscribe to
+
   private _currentUserAutoId: number | null = null;
   private _currentUserRoles: string[] = [];
 
-  constructor(private http: HttpClient) {
-    // In a real application, you might try to load token/user info from localStorage here
-    // on app startup to restore a session.
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object // Inject PLATFORM_ID to detect browser vs. server
+  ) {
+    // Initialize _isLoggedIn$ here, after platformId is available
+    this._isLoggedIn$ = new BehaviorSubject<boolean>(this.hasTokenInLocalStorage());
+    this.isLoggedIn$ = this._isLoggedIn$.asObservable(); // Assign the public observable
+
+    // Load user details from localStorage if available (after _isLoggedIn$ is set up)
     this.loadUserFromLocalStorage();
   }
 
   /**
+   * Safely checks if a token exists in localStorage, considering the platform.
+   * @returns True if a token exists in browser localStorage, false otherwise.
+   */
+  private hasTokenInLocalStorage(): boolean {
+    if (isPlatformBrowser(this.platformId)) {
+      return !!localStorage.getItem(this.TOKEN_KEY);
+    }
+    return false; // If not in browser, localStorage is not available
+  }
+
+  /**
    * Attempts to load user details from localStorage on service initialization.
+   * Updates internal state and notifies subscribers.
    */
   private loadUserFromLocalStorage(): void {
-    const storedToken = localStorage.getItem('jwtToken');
+    if (!isPlatformBrowser(this.platformId)) {
+      // If not in a browser, user cannot be logged in via localStorage
+      this._isLoggedIn$.next(false);
+      return;
+    }
+
+    const storedToken = localStorage.getItem(this.TOKEN_KEY);
     const storedEmail = localStorage.getItem('userEmail');
     const storedRoles = localStorage.getItem('userRoles');
-    // You would typically decode the JWT here to get user ID or make an API call /me
-    // For this example, we'll just set dummy data if a token exists for demonstration.
+
     if (storedToken && storedEmail && storedRoles) {
-      // In a real app, you'd decode the JWT to get the user ID, or fetch it from /api/users/me
-      // For now, let's just assume a dummy ID for the current logged-in user if a token exists.
-      // This is for client-side display logic; actual auth is backend-enforced.
-      // Replace with actual logic to get user ID from token or /me endpoint
-      this._currentUserAutoId = 101; // Example dummy ID for active user (e.g., matching a test user in your backend)
+      // In a real app, you'd decode the JWT or hit a /me endpoint to validate
+      this._currentUserAutoId = 101; // Placeholder: Replace with actual logic
       this._currentUserRoles = JSON.parse(storedRoles);
-      console.log('AuthService: Restored user from localStorage.');
+      this._isLoggedIn$.next(true); // Notify that user is logged in
+      console.log('AuthService: Restored user from localStorage. Logged in.');
+    } else {
+      // If data is incomplete, ensure logged out state
+      this.logout(false); // Do not navigate during initial load
     }
   }
 
-
   /**
-   * Handles user sign-in.
-   * Stores JWT and user info in localStorage upon success.
+   * Handles user sign-in. Stores JWT and user info in localStorage upon success.
    * @param signInData The sign-in credentials (email, password).
    * @returns An Observable of the SignInResponse.
    */
   signIn(signInData: SignInRequest): Observable<SignInResponse> {
-    return this.http.post<SignInResponse>(this.signInUrl, signInData).pipe(
+    return this.http.post<SignInResponse>(`${this.apiUrl}/login`, signInData).pipe(
       tap(response => {
         if (response && response.jwtToken) {
-          localStorage.setItem('jwtToken', response.jwtToken);
-          localStorage.setItem('userEmail', response.email);
-          localStorage.setItem('userRoles', JSON.stringify(response.roles));
+          if (isPlatformBrowser(this.platformId)) { // Only access localStorage in browser
+            localStorage.setItem(this.TOKEN_KEY, response.jwtToken);
+            localStorage.setItem('userEmail', response.email);
+            localStorage.setItem('userRoles', JSON.stringify(response.roles));
+          }
 
-          // Set internal state for current user.
-          // IMPORTANT: You'll need to get the user's autoId from your backend's login response
-          // or a subsequent /me API call. For now, using a dummy.
-          // If your SignInResponse contains userAutoId, use that:
-          // this._currentUserAutoId = response.userAutoId;
-          this._currentUserAutoId = 101; // Placeholder: Replace with actual user's autoId from backend
+          this._currentUserAutoId = 101; // Placeholder
           this._currentUserRoles = response.roles;
 
-          console.log('Token and user details stored. User state updated.');
+          this._isLoggedIn$.next(true); // Notify that user is logged in
+          console.log('SignIn successful. Token and user details stored.');
         } else {
           console.error('SignIn response did not contain a JWT token.');
           this.logout(); // Clear any partial data
@@ -104,19 +106,23 @@ export class AuthService {
    * @returns An Observable of the backend's sign-up response.
    */
   signUp(signUpData: SignUpRequest): Observable<any> {
-    return this.http.post(this.signUpUrl, signUpData);
+    return this.http.post(`${this.apiUrl}/register`, signUpData);
   }
 
   /**
    * Retrieves the JWT token from localStorage.
-   * @returns The JWT token string or null if not found.
+   * @returns The JWT token string or null if not found/not in browser.
    */
   getToken(): string | null {
-    return localStorage.getItem('jwtToken');
+    if (isPlatformBrowser(this.platformId)) { // Only access localStorage in browser
+      return localStorage.getItem(this.TOKEN_KEY);
+    }
+    return null;
   }
 
   /**
    * Checks if the user is currently logged in (has a JWT token).
+   * This uses getToken(), which already handles platform checks.
    * @returns True if a token exists, false otherwise.
    */
   isLoggedIn(): boolean {
@@ -125,20 +131,26 @@ export class AuthService {
 
   /**
    * Logs out the user by removing token and user details from localStorage.
-   * Also clears the internal user state.
+   * Also clears the internal user state and notifies subscribers.
+   * @param navigate Optional: If true, redirects to sign-in page after logout.
    */
-  logout(): void {
-    localStorage.removeItem('jwtToken');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userRoles');
+  logout(navigate: boolean = true): void {
+    if (isPlatformBrowser(this.platformId)) { // Only access localStorage in browser
+      localStorage.removeItem(this.TOKEN_KEY);
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userRoles');
+    }
     this._currentUserAutoId = null;
     this._currentUserRoles = [];
+    this._isLoggedIn$.next(false); // Notify that user is logged out
     console.log('User logged out. Local storage and user state cleared.');
+    if (navigate) {
+      this.router.navigate(['/signin_signup']); // Redirect to sign-in page
+    }
   }
 
   /**
    * Returns the current authenticated user's autoId.
-   * This would typically come from a decoded JWT or user session.
    * @returns Observable emitting the user's autoId or null if not logged in.
    */
   getCurrentUserAutoId(): Observable<number | null> {
@@ -147,11 +159,30 @@ export class AuthService {
 
   /**
    * Returns the current authenticated user's roles.
-   * This would typically come from a decoded JWT or user session.
    * @returns Observable emitting an array of user roles.
    */
   getCurrentUserRoles(): Observable<string[]> {
     return of(this._currentUserRoles);
   }
 
+
+  /**
+   * Sends a request to initiate password reset (send OTP).
+   * @param personalEmail The user's personal email to send OTP to.
+   * @returns An Observable of the MessageResponse from the backend.
+   */
+  forgotPassword(personalEmail: string): Observable<MessageResponse> {
+    // Backend expects a Map: Map.of("personalEmail", personalEmail)
+    return this.http.post<MessageResponse>(`${this.apiUrl}/forgot-password`, { personalEmail: personalEmail });
+  }
+
+  /**
+   * Sends a request to reset the password using OTP.
+   * @param resetRequest DTO containing organization email, OTP (token), and new password.
+   * @returns An Observable of the MessageResponse from the backend.
+   */
+  resetPassword(resetRequest: ResetPasswordRequest): Observable<MessageResponse> {
+    // Backend expects ResetPasswordRequest DTO
+    return this.http.post<MessageResponse>(`${this.apiUrl}/reset-password`, resetRequest);
+  }
 }

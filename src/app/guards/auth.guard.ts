@@ -1,4 +1,3 @@
-// src/app/guards/auth.guard.ts
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -18,9 +17,9 @@ export class AuthGuard implements CanActivate {
     if (this.authService.isLoggedIn()) {
       return true; // User is logged in, allow access
     } else {
-      // User is not logged in, redirect to the sign-in page
-      this.router.navigate(['/signin']);
-      return false;
+      // User is not logged in, redirect to the sign-in/sign-up page
+      console.warn('AuthGuard: User not logged in. Redirecting to /signin_signup');
+      return this.router.createUrlTree(['/signin_signup']); // <--- CORRECTED THIS LINE
     }
   }
 }
