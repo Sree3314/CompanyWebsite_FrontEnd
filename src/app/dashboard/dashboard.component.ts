@@ -25,6 +25,7 @@ export class DashboardComponent implements OnInit {
 
   showUploadForm: boolean = false;
   uploadForm: UploadRequest = {
+    uploadId:0,
     title: '',
     description: '',
     projectDuration: '',
@@ -60,6 +61,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching user details:', error);
+        console.error('Error details:', error.error);
         this.errorMessage = 'Failed to load user details. Please try again.';
         if (error.status === 401 || error.status === 403) {
           this.authService.logout();
@@ -121,6 +123,7 @@ export class DashboardComponent implements OnInit {
     this.showMyUploads = false;
     this.editMode = false;
     this.uploadForm = {
+      uploadId: 0, // Resetting uploadId for new uploads
       title: '',
       description: '',
       projectDuration: '',
@@ -193,7 +196,7 @@ export class DashboardComponent implements OnInit {
   }
 
   // --- New Delete Method ---
-  deleteUpload(uploadId: string): void {
+  deleteUpload(uploadId: number): void {
     if (confirm('Are you sure you want to delete this upload? This action cannot be undone.')) {
       this.uploadService.deleteUpload(uploadId).subscribe({
         next: () => {

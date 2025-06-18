@@ -1,0 +1,250 @@
+/* General page container styling for the Exhibition Listing Page */
+.page-container {
+  max-width: 1200px;
+  margin: 40px auto; /* Center the container with margin */
+  padding: 20px;
+  background-color: #f8f8f8; /* Light background for the page area */
+  border-radius: 10px; /* Rounded corners for the container */
+  /* Subtle shadow for the page container, using our primary blue for depth */
+  box-shadow: 0 6px 12px rgba(0, 0, 72, 0.15);
+  font-family: 'Inter', sans-serif; /* Use the Inter font */
+  color: #333; /* Default text color */
+}
+
+/* Page title and description */
+.page-title {
+  text-align: center;
+  color: #000048; /* Our deep blue for main titles */
+  font-size: 2.5em; /* Large font size for prominence */
+  margin-bottom: 10px;
+}
+
+.page-description {
+  text-align: center;
+  font-size: 1.1em;
+  color: #555;
+  margin-bottom: 30px; /* Space below description */
+}
+
+/* Filter controls section styling */
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap; /* Allow filters to wrap on smaller screens */
+  gap: 20px; /* Space between filter groups */
+  justify-content: center; /* Center the filter groups */
+  align-items: flex-end; /* Align inputs and buttons nicely at the bottom */
+  background-color: #e6e6f2; /* Lighter blue background for the filter bar */
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px; /* Space below filter controls */
+  /* Subtle inner shadow for the filter bar */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column; /* Stack label and input vertically */
+  flex: 1; /* Allow groups to grow and take available space */
+  min-width: 200px; /* Minimum width for readability on larger screens */
+}
+
+.filter-group label {
+  font-weight: bold;
+  color: #000048; /* Blue color for labels */
+  margin-bottom: 5px;
+}
+
+.filter-select,
+.filter-input {
+  padding: 10px 12px;
+  border: 1px solid #c0c0d0; /* Light greyish-blue border */
+  border-radius: 5px;
+  font-size: 1em;
+  color: #333;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth transitions for focus */
+  width: 100%; /* Make input/select fill container */
+  box-sizing: border-box; /* Include padding/border in element's total width/height */
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  border-color: #000048; /* Darker blue on focus */
+  box-shadow: 0 0 0 3px rgba(0, 0, 72, 0.2); /* Blue glow effect on focus */
+  outline: none; /* Remove default outline */
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px; /* Space between filter buttons */
+}
+
+.filter-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out; /* Smooth hover/active effects */
+}
+
+.filter-button.apply {
+  background-color: #000048; /* Primary blue for apply button */
+  color: #fff; /* White text */
+}
+
+.filter-button.apply:hover {
+  background-color: #000066; /* Darker blue on hover */
+  transform: translateY(-2px); /* Slight lift on hover */
+}
+
+.filter-button.clear {
+  background-color: #ccc; /* Grey for clear button */
+  color: #333;
+}
+
+.filter-button.clear:hover {
+  background-color: #bbb; /* Darker grey on hover */
+  transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Styles for messages (loading, error, no items found) */
+.message {
+  text-align: center;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  font-size: 1.1em;
+}
+
+.message.loading {
+  background-color: #e0f2f7; /* Light blue */
+  color: #000048;
+  border: 1px solid #b3e0ed;
+}
+
+.message.error {
+  background-color: #ffebee; /* Light red */
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.message.no-items {
+  background-color: #f0f0f0; /* Light grey */
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+
+/* Grid layout for Exhibition Cards */
+.exhibition-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px; /* Space between the cards */
+  padding: 0 10px; /* Small horizontal padding for the grid */
+}
+
+/* Styles for the basic exhibition card container (matching your desired look) */
+.basic-exhibition-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 72, 0.1);
+  padding: 20px;
+  margin: 15px; /* Keep margin if you like the space around cards */
+  background-color: #ffffff;
+  display: flex; /* Use flex for internal layout of card content */
+  flex-direction: column;
+  justify-content: space-between; /* Push button to bottom */
+  height: auto; /* Allow height to adjust to content */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.basic-exhibition-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 72, 0.15);
+}
+
+/* Card content styling (matching your preferences) */
+.basic-exhibition-card .card-title {
+  color: #000048;
+  margin-bottom: 10px;
+  font-size: 1.2em; /* Adjusted for better hierarchy on listing page */
+}
+
+.basic-exhibition-card .card-description {
+  font-size: 0.95em;
+  color: #555;
+  margin-bottom: 15px;
+  flex-grow: 1; /* Allow description to take space */
+}
+
+.basic-exhibition-card .card-uploader {
+  font-size: 0.85em;
+  color: #777;
+  display: block; /* Ensures it takes full width before button */
+  margin-bottom: 15px; /* Space before the button */
+}
+
+.basic-exhibition-card .card-details-button {
+  background-color: #000048;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  margin-top: auto; /* Push button to bottom */
+  cursor: pointer;
+  border: none; /* Ensure no default button border */
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.basic-exhibition-card .card-details-button:hover {
+  background-color: #000066;
+  transform: translateY(-1px);
+}
+
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .page-container {
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  .page-title {
+    font-size: 2em;
+  }
+
+  .page-description {
+    font-size: 1em;
+  }
+
+  .filter-controls {
+    flex-direction: column; /* Stack filters vertically on small screens */
+    align-items: stretch; /* Stretch items to full width */
+    padding: 15px;
+  }
+
+  .filter-group {
+    min-width: unset; /* Remove min-width to allow full width */
+    width: 100%;
+  }
+
+  .filter-actions {
+    flex-direction: column; /* Stack buttons vertically */
+  }
+
+  .basic-exhibition-card {
+    padding: 20px;
+    margin: 10px; /* Reduce margin on small screens */
+  }
+
+  .basic-exhibition-card .card-title {
+    font-size: 1.1em;
+  }
+
+  .basic-exhibition-card .card-description {
+    font-size: 0.85em;
+  }
+
+  .basic-exhibition-card .card-details-button {
+    width: 100%; /* Full width button on small screens */
+  }
+}

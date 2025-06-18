@@ -3,6 +3,7 @@
  * This matches the 'UploadRequest' DTO on your Spring Boot backend.
  */
 export interface UploadRequest {
+    uploadId:number,
     title: string;
     description: string;
     projectDuration: string;
@@ -17,6 +18,7 @@ export interface UploadRequest {
    * This matches the 'UploadDTO' on your Spring Boot backend.
    */
   export interface UploadDTO {
+    uploadId:number;
     id: string; // The unique ID of the upload (assuming it's a String from backend)
     title: string;
     description: string;
