@@ -1,78 +1,106 @@
-<section class="hero-section">
-  <div class="hero-image-container">
-    <img src="assets/company-hero.jpg" alt="Company Related Image" class="hero-image">
-  </div>
-  <div class="about-company-content">
-    <h2>About Your Company</h2>
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-    </p>
-  </div>
-</section>
+<div class="homepage-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-image-container">
+      <img [src]="image1" alt="Company Related Image" class="hero-image" style="width: 646px; height: 480px;">
+    </div>
+    <div class="about-company-content">
+      <h2>About Company Hub</h2>
+      <p>
+        <strong>Company Hub</strong> is a global technology consulting and services company that helps clients envision, build, and run more innovative and efficient businesses. Headquartered in <strong>Chennai, Tamil Nadu, India</strong>, we are dedicated to helping organizations across industries address their evolving digital needs. Leveraging deep industry expertise and a collaborative approach, Company Hub delivers end-to-end solutions, from strategic consulting to application development and infrastructure management. We are committed to driving measurable value and fostering long-term partnerships with our clients. Our focus is on helping businesses harness the power of technology to achieve their strategic objectives and stay ahead in a rapidly changing world.
+      </p>
+    </div>
+  </section>
 
-<section class="services-section">
-  <h2>Our Services</h2>
-  <div class="service-item left-image">
-    <div class="service-image-container">
-      <img src="assets/service1.jpg" alt="Service 1" class="service-image">
+  <!-- Services Section -->
+  <section class="services-section">
+    <h2>Who We Serve</h2>
+    <div class="service-item" (click)="openServiceModal(1)">
+      <div class="service-image-container">
+        <img [src]="serviceImage1" alt="Banking and Financial Services" class="service-image">
+      </div>
+      <div class="service-content">
+        <h3>Banking and Financial Services</h3>
+        <p>Partnering with leading banks, investment firms, and insurance providers to navigate regulatory landscapes, enhance customer experience, and drive digital transformation. We focus on providing secure, scalable, and innovative technology solutions tailored to the financial sector. **Our expertise empowers financial institutions to optimize operations, mitigate risks, and leverage data for strategic decision-making in a rapidly evolving market.</p>
+      </div>
     </div>
-    <div class="service-content">
-      <h3>Service One Title</h3>
-      <p>Details about service one. This service helps you achieve X, Y, and Z. We focus on providing top-notch quality and customer satisfaction.</p>
-    </div>
-  </div>
 
-  <div class="service-item right-image">
-    <div class="service-content">
-      <h3>Service Two Title</h3>
-      <p>Details about service two. Our innovative solutions are designed to streamline your processes and boost efficiency. We are committed to excellence.</p>
+    <div class="service-item" (click)="openServiceModal(2)">
+      <div class="service-image-container">
+        <img [src]="serviceImage2" alt="Healthcare" class="service-image">
+      </div>
+      <div class="service-content">
+        <h3>Healthcare</h3>
+        <p>Enabling healthcare organizations to improve patient outcomes, streamline operations, and foster innovation through cutting-edge digital solutions. Our expertise spans areas such as electronic health records, telehealth, and data analytics, always prioritizing security and compliance. We empower healthcare providers to leverage AI-driven insights for personalized care and predictive analytics, ensuring a more connected and efficient healthcare ecosystem.</p>
+      </div>
     </div>
-    <div class="service-image-container">
-      <img src="assets/service2.jpg" alt="Service 2" class="service-image">
-    </div>
-  </div>
 
-  <div class="service-item left-image">
-    <div class="service-image-container">
-      <img src="assets/service3.jpg" alt="Service 3" class="service-image">
+    <div class="service-item" (click)="openServiceModal(3)">
+      <div class="service-image-container">
+        <img [src]="serviceImage3" alt="Retail and Consumer Goods" class="service-image">
+      </div>
+      <div class="service-content">
+        <h3>Retail and Consumer Goods</h3>
+        <p>Helping retail and consumer goods companies enhance customer engagement, optimize supply chains, and adapt to changing consumer preferences. We offer solutions in areas like e-commerce platforms, customer relationship management, and data-driven marketing. Logistics to personalized customer experiences, ensuring businesses can thrive in an increasingly competitive market.</p>
+      </div>
     </div>
-    <div class="service-content">
-      <h3>Service Three Title</h3>
-      <p>Details about service three. Discover how our expertise can benefit your business. We offer tailored solutions to meet your specific needs.</p>
-    </div>
-  </div>
 
-  <div class="service-item right-image">
-    <div class="service-content">
-      <h3>Service Four Title</h3>
-      <p>Details about service four. We provide comprehensive support and guidance, ensuring your success. Our team is dedicated to delivering outstanding results.</p>
+    <div class="service-item" (click)="openServiceModal(4)">
+      <div class="service-image-container">
+        <img [src]="serviceImage4" alt="Manufacturing" class="service-image">
+      </div>
+      <div class="service-content">
+        <h3>Manufacturing</h3>
+        <p>Empowering manufacturing businesses to increase efficiency, improve product quality, and embrace Industry 4.0 technologies. Our services include IoT integration, automation, and enterprise resource planning to drive operational excellence. We specialize in developing smart factory solutions, predictive maintenance systems, and robust supply chain optimization tools that enhance productivity, reduce costs, and accelerate time-to-market for complex products.</p>
+      </div>
     </div>
-    <div class="service-image-container">
-      <img src="assets/service4.jpg" alt="Service 4" class="service-image">
-    </div>
-  </div>
-</section>
+  </section>
 
-<section class="achievements-section">
-  <h2>Our Achievements</h2>
-  <div class="achievement-cards-container">
-    <div class="achievement-card">
-      <h3>Achievement Title 1</h3>
-      <p>Brief description of achievement 1. We reached a significant milestone in Q1 2024, expanding our market reach by 20%.</p>
+  <!-- Achievements Section -->
+  <section class="achievements-section">
+    <h2>Our Achievements</h2>
+    <div class="achievement-cards-container">
+      <div class="achievement-card" (click)="openAchievementModal(1)">
+        <h3>Successful Client Engagements</h3>
+        <p>Consistently delivering high-quality solutions and achieving significant business outcomes for our diverse portfolio of clients.</p>
+      </div>
+      <div class="achievement-card" (click)="openAchievementModal(2)">
+        <h3>Industry Recognition</h3>
+        <p>Recognized by leading industry analysts and publications for our expertise and innovation in technology consulting.</p>
+      </div>
+      <div class="achievement-card" (click)="openAchievementModal(3)">
+        <h3>Talent Development</h3>
+        <p>Fostering a culture of continuous learning and growth, empowering our employees to excel and contribute to client success.</p>
+      </div>
+      <div class="achievement-card" (click)="openAchievementModal(4)">
+        <h3>Commitment to Excellence</h3>
+        <p>Maintaining a strong focus on quality, integrity, and customer satisfaction in all our engagements.</p>
+      </div>
+      <div class="achievement-card" (click)="openAchievementModal(5)">
+        <h3>Global Expansion</h3>
+        <p>Successfully launched operations in two new international markets, broadening our global footprint and client base.</p>
+      </div>
+      <div class="achievement-card" (click)="openAchievementModal(6)">
+        <h3>Sustainable Practices</h3>
+        <p>Achieved a 25% reduction in carbon footprint across our operations, demonstrating our commitment to environmental responsibility.</p>
+      </div>
     </div>
-    <div class="achievement-card">
-      <h3>Achievement Title 2</h3>
-      <p>Brief description of achievement 2. Awarded "Best Innovator of the Year" for our groundbreaking work in sustainable technology.</p>
-    </div>
-    <div class="achievement-card">
-      <h3>Achievement Title 3</h3>
-      <p>Brief description of achievement 3. Successfully completed over 500 projects with 98% client satisfaction rate.</p>
-    </div>
-    <div class="achievement-card">
-      <h3>Achievement Title 4</h3>
-      <p>Brief description of achievement 4. Recognized for our commitment to community service, contributing 1000+ volunteer hours.</p>
+  </section>
+</div>
+
+<!-- The Modal Structure -->
+<div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()"></div>
+<div class="modal-content" *ngIf="showModal">
+  <button class="close-button" (click)="closeModal()">&times;</button>
+  <div class="modal-left">
+    <img [src]="modalImage" alt="{{ modalTitle }}" class="modal-image">
+  </div>
+  <div class="modal-right">
+    <h3>{{ modalTitle }}</h3>
+    <p>{{ modalDescription }}</p>
+    <div class="modal-buttons">
+      <button class="modal-primary-button">Learn More</button>
+      <button class="modal-secondary-button" (click)="closeModal()">Close</button>
     </div>
   </div>
-</section>
+</div>

@@ -15,4 +15,5 @@ import { RouterOutlet, RouterLink } from '@angular/router'; // Import RouterOutl
 })
 export class AppComponent {
   title = 'Company Homepage';
+  image = "assets/company.png"; // Path to your logo image
 }

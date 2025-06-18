@@ -23,8 +23,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
-              }
+                "input": "src/assets"
+              },"src/assets"
             ],
             "styles": [
               "src/styles.css"
@@ -86,8 +86,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
-              }
+                "input": "src/assets"
+              },"src/assets"
             ],
             "styles": [
               "src/styles.css"

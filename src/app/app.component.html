@@ -1,7 +1,7 @@
 <div class="app-container"> <header class="header">
   <div class="logo-section">
-    <img src="assets/company-logo.png" alt="Company Logo" class="company-logo">
-    <h1 class="company-name">Your Company Name</h1>
+    <img [src] = "image" alt="Company" class="company-logo">
+    <h1 class="company-name">Company HUB</h1>
   </div>
   <nav class="navigation">
     <a routerLink="/home" class="nav-link">Home</a> 
@@ -18,5 +18,10 @@
 
 <footer class="footer">
   <p>&copy; 2025 Your Company Name. All rights reserved.</p>
+  <div class="footer-links">
+    <a href="https://www.google.com" target="_blank" rel="noopener noreferrer">Google</a> |
+    <a href="tel:+1234567890">Telephone</a> |
+    <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
+  </div>
 </footer>
 </div>
