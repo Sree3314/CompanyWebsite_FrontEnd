@@ -1,265 +1,522 @@
 /* General Body Styles */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background-color: white; /* Base background */
-    color: #333; /* Default text color */
+  font-family: 'Merriweather', 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  /* Changed to a pleasing sky blue gradient */
+  background: linear-gradient(135deg, #e0f7fa 0%, #aed6f1 100%);
+  color: #333; /* Default text color */
+}
+
+h1, h2, h3 {
+  font-family: 'Merriweather', serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #002147; /* Deep blue for formality */
+  margin-bottom: 8px;
+}
+
+.homepage-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header Styles (as provided in previous context - ensure this is outside of .homepage-container if it's a global header) */
+/* .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  background-color: #001f3f;
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 30px;
+} */
+/* ... other header styles ... */
+
+
+/* Hero Section Styles */
+.hero-section {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Reduce gap between image and text */
+  padding: 50px 0;
+  background: transparent; /* Allows the body gradient to show through */
+  border-bottom: 1px solid #eee;
+  margin-bottom: 40px;
+  border-radius: 8px; /* Added border-radius */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Added subtle shadow */
+  padding: 30px; /* Added some padding around the section */
+}
+
+/* Hero Image Container (for single image) */
+.hero-image-container {
+  flex: 1;
+  text-align: center; /* Center the image within its container */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Ensure image border-radius applies cleanly */
+}
+
+.hero-image {
+  width: 350px;      /* Increase width as needed */
+  height: 350px;     /* Increase height as needed */
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+  margin-bottom: 12px; /* Reduce space below the logo */
+  /* New: Smooth transition for transform */
+  transition: transform 0.3s ease-in-out;
+}
+
+/* New: Hover effect for hero image */
+.hero-image:hover {
+  transform: scale(1.03); /* Increases size by 3% on hover */
+}
+
+.about-company-content {
+  flex: 1;
+}
+
+.about-company-content h2 {
+  color: #001f3f; /* Dark Blue */
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-top: 0;         /* Remove extra space above */
+  margin-bottom: 8px;    /* Reduce space below the company name */
+}
+
+.about-company-content p {
+  line-height: 1.8;
+  color: #555;
+  font-size: 1.1em;
+}
+
+/* Services Section Styles */
+.services-section {
+  padding: 60px 0;
+  text-align: center;
+  margin-bottom: 40px;
+  background: transparent; /* Allows the body gradient to show through */
+  border-radius: 8px; /* Added border-radius */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Added subtle shadow */
+  padding: 30px; /* Added some padding around the section */
+}
+
+.services-section h2 {
+  color: #001f3f; /* Dark Blue */
+  font-size: 2.5em;
+  margin-bottom: 50px;
+}
+
+.service-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 60px;
+  gap: 40px;
+  background-color: #f8f8f8; /* Slightly off-white for service blocks */
+  padding: 35px; /* Increased internal padding further */
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out; /* Added transition */
+  border: 1px solid #e0e0e0; /* Subtle border */
+  cursor: pointer; /* Added for clickability */
+}
+
+.service-item:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+.service-item:hover {
+  /* Modified: Aligning with achievement-card hover effect */
+  transform: translateY(-10px); /* Matches achievement card lift */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Matches achievement card shadow */
+  background-color: #eef7ff; /* Lighter background on hover (keeping original for services) */
+}
+
+.service-image-container {
+  flex: 0.7; /* Image container takes up less space */
+  max-width: 450px; /* Increased max-width of the image container further */
+  text-align: center;
+}
+
+.service-image {
+  width: 100%;
+  height: 250px; /* Increased fixed height for images further */
+  object-fit: cover; /* Ensures images cover the area without distortion */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.service-content {
+  flex: 1.3; /* Content takes up more space */
+  text-align: left;
+}
+
+.service-content h3 {
+  color: #001f3f; /* Dark Blue */
+  font-size: 1.8em;
+  margin-bottom: 15px;
+}
+
+.service-content p {
+  color: #666;
+  line-height: 1.7;
+}
+
+/* Achievements Section Styles */
+.achievements-section {
+  padding: 40px 0;
+  text-align: center;
+  margin-bottom: 40px;
+  background: transparent; /* Allows the body gradient to show through */
+  border-radius: 8px; /* Added border-radius */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Added subtle shadow */
+  padding: 30px; /* Added some padding around the section */
+}
+
+.achievements-section h2 {
+  color: #001f3f; /* Dark Blue */
+  font-size: 2.5em;
+  margin-bottom: 50px;
+}
+
+.achievement-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Auto-fit to create responsive columns */
+  gap: 30px; /* This is the original gap for achievement cards, as requested */
+  justify-content: center;
+}
+
+.achievement-card {
+  background-color: #001f3f; /* Dark Blue */
+  color: white;
+  padding: 30px; /* This is the original padding for achievement cards, as requested */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  cursor: pointer; /* Added for clickability */
+}
+
+.achievement-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  background-color: #003366; /* Slightly lighter blue on hover */
+}
+
+.achievement-card h3 {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+  color: white;
+}
+
+.achievement-card p {
+  font-size: 1em;
+  line-height: 1.6;
+  color: #f0f0f0;
+}
+
+/* Footer Styles (Optional - assuming it's a separate component or not included in this HTML) */
+/* .footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #001f3f;
+  color: white;
+  margin-top: 50px;
+  border-radius: 8px;
+} */
+
+
+/* --- MODAL STYLES (Refined to match image and user feedback) --- */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Darker backdrop */
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #f8f8f8; /* Light background for the modal card itself */
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 900px; /* Wider to accommodate side-by-side content */
+  height: 60vh; /* Fixed height for a more consistent look */
+  min-height: 450px; /* Minimum height for better content display */
+  z-index: 1001;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; /* Flex container for the two main columns (image & text/buttons) */
+  overflow: hidden; /* Important for hiding content that goes beyond border-radius */
+  animation: fadeInScale 0.3s ease-out forwards;
+  padding: 0;
+  background-color: #e0f2f7; /* A light blue-grey similar to the image's overall modal background */
+  background-position: right center; /* Adjust if using a pattern image */
+  background-repeat: no-repeat;
+  background-size: contain; /* Adjust based on pattern */
+}
+
+/* Animation remains the same */
+@keyframes fadeInScale {
+  from {
+      opacity: 0;
+      transform: translate(-50%, -45%) scale(0.9);
   }
-  
-  .homepage-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+  to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
   }
-  
-  /* Header Styles */
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    background-color: #001f3f; /* Dark Blue */
-    color: white;
-    border-radius: 8px;
-    margin-bottom: 30px;
-  }
-  
-  .logo-section {
-    display: flex;
-    align-items: center;
-    padding-left: 20px;
-  }
-  
-  .company-logo {
-    height: 50px; /* Adjust as needed */
-    margin-right: 15px;
-  }
-  
-  .company-name {
-    font-size: 1.8em;
-    margin: 0;
-    color: white;
-  }
-  
-  .navigation {
-    padding-right: 20px;
-  }
-  
-  .nav-link {
-    color: white;
-    text-decoration: none;
-    margin-left: 25px;
-    font-weight: bold;
-    transition: color 0.3s ease;
-  }
-  
-  .nav-link:hover {
-    color: #add8e6; /* Lighter blue on hover */
-  }
-  
-  .sign-in-up {
-    background-color: white;
-    color: #001f3f; /* Dark Blue */
-    padding: 8px 15px;
-    border-radius: 5px;
-    text-transform: uppercase;
-    font-size: 0.9em;
-  }
-  
-  .sign-in-up:hover {
-    background-color: #f0f0f0;
-  }
-  
-  /* Hero Section Styles */
-  .hero-section {
-    display: flex;
-    align-items: center;
-    gap: 40px;
-    padding: 50px 0;
-    background-color: white;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 40px;
-  }
-  
-  .hero-image-container {
-    flex: 1;
-    text-align: center;
-  }
-  
-  .hero-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .about-company-content {
-    flex: 1;
-  }
-  
-  .about-company-content h2 {
-    color: #001f3f; /* Dark Blue */
-    font-size: 2.5em;
-    margin-bottom: 20px;
-  }
-  
-  .about-company-content p {
-    line-height: 1.8;
-    color: #555;
-    font-size: 1.1em;
-  }
-  
-  /* Services Section Styles */
-  .services-section {
-    padding: 40px 0;
-    text-align: center;
-    margin-bottom: 40px;
-  }
-  
-  .services-section h2 {
-    color: #001f3f; /* Dark Blue */
-    font-size: 2.5em;
-    margin-bottom: 50px;
-  }
-  
-  .service-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 60px;
-    gap: 40px;
-    background-color: #f8f8f8; /* Slightly off-white for service blocks */
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  }
-  
-  .service-item:nth-child(even) { /* For alternating layout */
-    flex-direction: row-reverse;
-  }
-  
-  .service-image-container {
-    flex: 1;
-    text-align: center;
-  }
-  
-  .service-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .service-content {
-    flex: 1;
-    text-align: left;
-  }
-  
-  .service-content h3 {
-    color: #001f3f; /* Dark Blue */
-    font-size: 1.8em;
-    margin-bottom: 15px;
-  }
-  
-  .service-content p {
-    color: #666;
-    line-height: 1.7;
-  }
-  
-  /* Achievements Section Styles */
-  .achievements-section {
-    padding: 40px 0;
-    text-align: center;
-    margin-bottom: 40px;
-  }
-  
-  .achievements-section h2 {
-    color: #001f3f; /* Dark Blue */
-    font-size: 2.5em;
-    margin-bottom: 50px;
-  }
-  
-  .achievement-cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    justify-content: center;
-  }
-  
-  .achievement-card {
-    background-color: #001f3f; /* Dark Blue */
-    color: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: left;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .achievement-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  }
-  
-  .achievement-card h3 {
-    font-size: 1.5em;
-    margin-bottom: 15px;
-    color: white;
-  }
-  
-  .achievement-card p {
-    font-size: 1em;
-    line-height: 1.6;
-    color: #f0f0f0;
-  }
-  
-  /* Footer Styles (Optional) */
-  .footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #001f3f; /* Dark Blue */
-    color: white;
-    margin-top: 50px;
-    border-radius: 8px;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .header {
+}
+
+.close-button {
+  background: #ffffff; /* White background for the close button itself */
+  border: none;
+  font-size: 1.8em; /* Slightly smaller 'x' for better integration */
+  font-weight: bold;
+  cursor: pointer;
+  color: #555;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 1002; /* Ensure it's above everything */
+  width: 35px; /* Fixed width to make it circular */
+  height: 35px; /* Fixed height to make it circular */
+  display: flex; /* Use flexbox to center the 'x' */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  border-radius: 50%;
+  line-height: 1; /* Ensure no extra line height pushes 'x' */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for the button */
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.close-button:hover {
+  background-color: #e0e0e0; /* Light grey on hover */
+  color: #333;
+  transform: scale(1.1);
+}
+
+.modal-left {
+  flex: 0 0 45%; /* Fixed width for the left column (image) - adjust as needed */
+  display: flex;
+  align-items: center; /* Center image vertically */
+  justify-content: center; /* Center image horizontally */
+  padding: 20px; /* Padding inside the left column */
+  background-color: transparent; /* Allows main modal background to show */
+  position: relative; /* For image positioning if needed */
+}
+
+.modal-image {
+  width: 100%; /* Image takes full width of its container */
+  max-width: 380px; /* Max width for the image */
+  height: auto; /* Maintain aspect ratio */
+  object-fit: contain; /* Contain the image within its bounds */
+  border-radius: 8px; /* Rounded corners for the image */
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow for the image */
+  transition: transform 0.3s ease-in-out;
+}
+
+.modal-right {
+  flex: 1; /* Right column takes remaining space */
+  display: flex;
+  flex-direction: column;
+  /* Adjusted alignment for content within the right pane */
+  justify-content: space-between; /* Distribute space: title/p at top, buttons at bottom */
+  align-items: center; /* Center text/buttons horizontally */
+  text-align: center; /* Ensures text is centered */
+  padding: 30px; /* Padding for the right column */
+  position: relative;
+  z-index: 1; /* Ensure text is above any potential background patterns */
+  color: #333; /* Default text color for this section */
+  overflow-y: auto; /* Allow content to scroll if it overflows its fixed height */
+}
+
+.modal-right h3 {
+  font-size: 2.2em; /* Larger title */
+  margin-bottom: 10px;
+  color: #001f3f; /* Dark Blue */
+  line-height: 1.2; /* Tighter line height for title */
+  flex-shrink: 0; /* Prevent title from shrinking */
+}
+
+.modal-right p {
+  font-size: 1.1em;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 30px; /* Space before buttons */
+  max-width: 90%; /* Constrain text width */
+  flex-grow: 1; /* Allow paragraph to grow and push buttons down */
+  overflow-y: auto; /* Ensure paragraph content can scroll if very long */
+  padding-right: 5px; /* Prevent scrollbar from overlapping text */
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  gap: 15px; /* Space between buttons */
+  width: 80%; /* Constrain button width */
+  max-width: 300px; /* Max width for buttons */
+  flex-shrink: 0; /* Prevent buttons from shrinking */
+  margin-top: auto; /* Push buttons to the bottom of the flex container */
+  padding-top: 15px; /* Add some padding above buttons if needed */
+}
+
+.modal-primary-button {
+  background-color: #ff6f61; /* Pinkish-red, like the "Take Quiz" button */
+  color: white;
+  padding: 15px 25px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Subtle shadow for buttons */
+}
+
+.modal-primary-button:hover {
+  background-color: #e05e53; /* Darker pink on hover */
+  transform: translateY(-2px);
+}
+
+.modal-secondary-button {
+  background: none;
+  color: #666; /* Grey text, like "Maybe Later" */
+  padding: 15px 25px;
+  border: 1px solid #ccc; /* Subtle border */
+  border-radius: 5px;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.modal-secondary-button:hover {
+  color: #333;
+  border-color: #888;
+  background-color: #f0f0f0;
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  /* Header (if included in this component) */
+  /* .header {
       flex-direction: column;
       text-align: center;
       padding-bottom: 10px;
-    }
-  
-    .navigation {
+  } */
+
+  /* .navigation {
       margin-top: 20px;
       padding-right: 0;
-    }
-  
-    .nav-link {
+  } */
+
+  /* .nav-link {
       margin: 0 10px 10px 10px;
       display: inline-block;
-    }
-  
-    .hero-section {
+  } */
+
+  .hero-section {
       flex-direction: column;
       text-align: center;
-    }
-  
-    .service-item {
+  }
+
+  .service-item {
       flex-direction: column !important; /* Override alternating for smaller screens */
-    }
-  
-    .service-content, .service-image-container {
+  }
+
+  .service-content, .service-image-container {
       flex: none; /* Reset flex for single column */
       width: 100%;
-    }
-  
-    .service-content {
+      max-width: unset; /* Remove max-width constraint for images on small screens */
+  }
+
+  .service-content {
       text-align: center;
       margin-top: 20px;
-    }
-  
-    .achievement-cards-container {
-      grid-template-columns: 1fr;
-    }
   }
+
+  .achievement-cards-container {
+      grid-template-columns: 1fr; /* Single column for small screens */
+  }
+
+  /* Responsive adjustments for modal */
+  .modal-content {
+      flex-direction: column; /* Stack columns vertically on small screens */
+      width: 95%;
+      height: auto; /* Auto height for content */
+      max-height: 90vh; /* Maintain max height for scroll */
+      border-radius: 10px;
+  }
+
+  .modal-left {
+      flex: none; /* Remove flex sizing */
+      width: 100%; /* Full width for image container */
+      height: 200px; /* Fixed height for image on small screens */
+      padding: 15px;
+  }
+
+  .modal-image {
+      max-width: 100%; /* Image takes full width available */
+      height: 100%;
+      object-fit: cover; /* Crop to fit if needed */
+      border-radius: 5px; /* Smaller border radius */
+  }
+
+  .modal-right {
+      flex: none; /* Remove flex sizing */
+      width: 100%; /* Full width for text/button container */
+      padding: 20px;
+      text-align: center;
+      justify-content: flex-start; /* Align content to top */
+  }
+
+  .modal-right h3 {
+      font-size: 1.6em;
+      margin-bottom: 8px;
+  }
+
+  .modal-right p {
+      font-size: 0.95em;
+      margin-bottom: 20px;
+  }
+
+  .modal-buttons {
+      width: 90%; /* Wider buttons on small screens */
+      max-width: none;
+      gap: 10px;
+  }
+
+  .modal-primary-button,
+  .modal-secondary-button {
+      padding: 12px 20px;
+      font-size: 1em;
+  }
+
+  .close-button {
+      font-size: 1.5em;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      padding: 0; /* No padding needed with flexbox centering */
+  }
+}
+
+/* Important Text Styles */
+.important {
+  color: #0074D9;
+  font-style: italic;
+  font-weight: 500;
+}

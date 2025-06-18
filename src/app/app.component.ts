@@ -1,40 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'; // Import OnInit, OnDestroy
-import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink } from '@angular/router';
-import { AuthService } from './services/auth.service'; // Import your AuthService
-import { Subscription } from 'rxjs'; // Import Subscription to manage the subscription
-
+// src/app/app.component.ts
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common'; // Needed for things like *ngIf, *ngForq
+import { RouterOutlet, RouterLink } from '@angular/router'; // Import RouterOutlet and RouterLink
 @Component({
   selector: 'app-root',
-  standalone: true,
+  standalone: true, // <--- This indicates it's a standalone component
   imports: [
     CommonModule,
-    RouterOutlet,
-    RouterLink
+    RouterOutlet, // For the main router-outlet in app.component.html
+    RouterLink    // For the navigation links in app.component.html   // Allows you to use routerLink="" in your HTML
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit, OnDestroy { // Implement OnInit and OnDestroy
+export class AppComponent {
   title = 'Company Homepage';
-  isLoggedIn: boolean = false; // This property will hold the current login status
-  private authSubscription: Subscription | undefined; // To store and manage the subscription
-
-  constructor(private authService: AuthService) {}
-
-  ngOnInit(): void {
-    // Subscribe to the isLoggedIn$ observable from AuthService
-    // This will notify the component whenever the login status changes
-    this.authSubscription = this.authService.isLoggedIn$.subscribe(loggedIn => {
-      this.isLoggedIn = loggedIn;
-      console.log('App Component: Login status changed to:', loggedIn);
-    });
-  }
-
-  ngOnDestroy(): void {
-    // It's crucial to unsubscribe to prevent memory leaks
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
-    }
-  }
+  image = "assets/company.png"; // Path to your logo image
 }
+ 
