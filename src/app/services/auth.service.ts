@@ -3,8 +3,11 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, tap, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
+import { jwtDecode } from 'jwt-decode';
 
-import { SignInRequest, SignInResponse, SignUpRequest ,MessageResponse,ResetPasswordRequest} from '../models/auth.model';
+// IMPORTANT: Import your models from the correct path
+import { SignInRequest, SignInResponse, SignUpRequest, MessageResponse, ResetPasswordRequest } from '../models/auth.model';
+
 
 @Injectable({
   providedIn: 'root'
@@ -178,6 +181,64 @@ export class AuthService {
     return this.http.post<MessageResponse>(`${this.apiUrl}/forgot-password`, { personalEmail: personalEmail });
   }
 
+  getUserRoles(): string[] {
+    if (isPlatformBrowser(this.platformId)) {
+      const storedRoles = localStorage.getItem('userRoles');
+      console.log('AuthService.getUserRoles(): Raw roles from localStorage:', storedRoles); // Debug log
+      if (storedRoles) {
+        try {
+          const roles = JSON.parse(storedRoles);
+          if (Array.isArray(roles) && roles.every(role => typeof role === 'string')) {
+            console.log('AuthService.getUserRoles(): Parsed roles:', roles); // Debug log
+            return roles; // Expecting roles like ["MANAGER", "USER"] directly
+          }
+          console.warn('AuthService.getUserRoles(): Stored "userRoles" is not a valid string array:', roles); // Warn
+          return [];
+        } catch (e) {
+          console.error('AuthService.getUserRoles(): Error parsing "userRoles" from localStorage:', e); // Error
+          return [];
+        }
+      }
+    }
+    console.log('AuthService.getUserRoles(): No "userRoles" found in localStorage or not in browser.'); // Debug log
+    return [];
+  }
+
+  /**
+   * Checks if the current user has the 'MANAGER' role.
+   * @returns True if the user has the MANAGER role, false otherwise.
+   */
+  isManager(): boolean {
+    const roles = this.getUserRoles();
+    const isMgr = roles.includes('MANAGER'); // Check if 'MANAGER' string exists in the array
+    console.log('AuthService.isManager(): Result:', isMgr, ' (Roles:', roles, ')'); // Debug log
+    return isMgr;
+  }
+
+  getCurrentUserName(): string | null {
+    if (isPlatformBrowser(this.platformId)) {
+        return localStorage.getItem('userEmail'); // Assuming email is fine for display name
+    }
+    return null;
+  }
+
+  getEmployeeIdFromToken(): number | null {
+    const token = this.getToken();
+    if (!token) {
+      return null;
+    }
+    try {
+      const decodedToken: any = jwtDecode(token);
+      if (typeof decodedToken.employeeId === 'number') {
+        return decodedToken.employeeId;
+      }
+      return null;
+    } catch (e) {
+      console.error('AuthService: Error decoding token for employeeId:', e);
+      this.logout(false);
+      return null;
+    }
+  }
   /**
    * Sends a request to reset the password using OTP.
    * @param resetRequest DTO containing organization email, OTP (token), and new password.
