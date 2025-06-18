@@ -7,6 +7,7 @@ export interface SignInRequest {
     jwtToken: string;
     email: string;
     roles: string[];
+    employeeId?: number;
     // Add other fields your backend login response includes them, e.g., firstName, lastName, userAutoId
   }
   

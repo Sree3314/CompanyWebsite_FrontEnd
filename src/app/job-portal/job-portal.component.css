@@ -1,0 +1,576 @@
+/* General container for the job portal */
+.job-portal-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
+  background-color: #f8fafd; /* Lighter background for the overall container */
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+  font-family: 'Inter', sans-serif;
+  color: #333; /* Default text color */
+}
+
+/* New: Stylish Navigation Bar */
+.main-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px; /* Space between manager and user nav sections */
+  margin-bottom: 0; /* REDUCED: Removed bottom margin from nav bar */
+  background: linear-gradient(135deg, #e0eafc, #cfdef3); /* Light gradient background */
+  padding: 15px 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.nav-section {
+  display: flex;
+  gap: 15px; /* Space between individual nav buttons */
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nav-button {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 8px; /* Slightly rounded for a modern look */
+  cursor: pointer;
+  font-size: 1.05em;
+  font-weight: 600;
+  color: #3f51b5; /* Primary color for text */
+  background-color: #f0f5fd; /* Light background for non-active buttons */
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between icon and text */
+}
+
+.nav-button:hover {
+  background-color: #e6eefc; /* Lighter hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-button.active {
+  background-color: #673ab7; /* Deeper purple for active state */
+  color: white;
+  box-shadow: 0 4px 10px rgba(103, 58, 183, 0.4);
+  transform: translateY(-1px);
+}
+
+.nav-button.active:hover {
+  background-color: #512da8; /* Even deeper purple on active hover */
+}
+
+/* Font Awesome Icons (ensure you have Font Awesome loaded in your index.html) */
+.nav-button i {
+  font-size: 1.1em;
+}
+
+
+/* Common styles for sections that act as cards/containers */
+.card-layout {
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Consistent card shadow */
+  margin-top: 20px; /* Keep this to separate sections */
+}
+
+/* Job List and Application List Containers */
+.jobs-list-container, .applications-list-container, .my-applications-list-container {
+  padding: 20px;
+  /* margin-top is now handled by .card-layout where applicable */
+}
+
+/* NEW: Styles for section headers (heading + search bar) */
+.section-header {
+  display: flex;
+  justify-content: space-between; /* Pushes heading left, search bar right */
+  align-items: center; /* Vertically align them */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  margin-bottom: 30px; /* Space below the header area */
+  padding: 0 10px; /* Some padding for alignment */
+}
+
+.section-header h2 {
+  color: #343a40;
+  margin: 0; /* Remove default margin to control spacing with flexbox */
+  font-size: 2.2em; /* Slightly larger heading */
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.05); /* Subtle text shadow */
+  flex-shrink: 0; /* Prevent heading from shrinking */
+}
+
+/* NEW: Styling for the search bar container */
+.search-bar-container {
+  flex-grow: 1; /* Allows it to take available space */
+  max-width: 400px; /* Limit width */
+  margin-left: 20px; /* Space between heading and search bar */
+  position: relative; /* For potential icon positioning */
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 18px;
+  border: 2px solid #a7d0f7; /* More prominent border */
+  border-radius: 30px; /* Pill shape */
+  font-size: 1.05em;
+  color: #333;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.1); /* Subtle blue shadow */
+  transition: all 0.3s ease;
+  outline: none; /* Remove default outline */
+}
+
+.search-input::placeholder {
+  color: #99aab5; /* Softer placeholder color */
+  opacity: 0.9;
+}
+
+.search-input:focus {
+  border-color: #007bff; /* Highlight on focus */
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.25); /* Stronger shadow on focus */
+  transform: translateY(-1px); /* Slight lift */
+}
+
+
+/* NEW: Grid Layout for job and application cards */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* 2 columns on larger screens, adaptable */
+  gap: 25px; /* Space between cards */
+  list-style: none;
+  padding: 0;
+}
+
+.job-card, .application-card {
+  /* Removed individual background, border, border-radius, padding, margin-bottom, box-shadow */
+  /* These are now handled by .card-layout and .grid-container */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smoother transition */
+  display: flex; /* Make it a flex container */
+  flex-direction: column; /* Stack children vertically */
+  justify-content: space-between; /* This will push the last item (buttons) to the bottom */
+}
+
+.job-card:hover, .application-card:hover {
+  transform: translateY(-8px); /* More pronounced lift effect */
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15); /* Stronger hover shadow */
+}
+
+.job-card h3, .application-card h3 {
+  color: #007bff; /* Consistent blue for titles */
+  margin-top: 0;
+  margin-bottom: 15px; /* Increased spacing */
+  font-size: 1.7em;
+  word-break: break-word; /* Prevent long titles from overflowing */
+}
+
+.job-card p, .application-card p {
+  margin-bottom: 8px; /* Slightly increased margin */
+  font-size: 0.95em;
+  color: #555; /* Slightly darker text for better readability */
+  line-height: 1.6;
+}
+
+/* NEW: Ensures content fills space, pushing actions to bottom */
+.card-details {
+  flex-grow: 1; /* Allows this section to take up available space, making cards uniform height */
+  margin-bottom: 15px; /* Space between content and buttons */
+}
+
+/* Style for the description to limit height and add scrollbar */
+.card-details p strong:first-child + span { /* Targets the span after the first strong (Description) within card-details */
+  display: block; /* Ensures it takes up its own block space */
+  max-height: 90px; /* Limit height of the description paragraph */
+  overflow-y: auto; /* Add vertical scrollbar if content overflows */
+  margin-top: 5px; /* Small space below "Description:" label */
+  margin-bottom: 15px; /* Space below description before next field */
+  padding-right: 5px; /* Prevent scrollbar from overlapping text */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #cce0ff #f0f5fd; /* Firefox scrollbar color */
+}
+
+/* Webkit (Chrome, Safari) scrollbar styling */
+.card-details p strong:first-child + span::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card-details p strong:first-child + span::-webkit-scrollbar-track {
+  background: #f0f5fd;
+  border-radius: 10px;
+}
+
+.card-details p strong:first-child + span::-webkit-scrollbar-thumb {
+  background-color: #cce0ff;
+  border-radius: 10px;
+  border: 2px solid #f0f5fd;
+}
+
+
+.job-card p strong, .application-card p strong {
+  color: #343a40;
+}
+
+.application-card a {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.application-card a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+/* Styles for common buttons */
+.btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 30px; /* Slightly less rounded than 50px for modern feel */
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex; /* For better text and icon alignment if added */
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  color: white;
+  box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+}
+
+.btn-info:hover {
+  background-color: #117a8b;
+  box-shadow: 0 6px 12px rgba(23, 162, 184, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  background-color: #28a745;
+  color: white;
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-success:hover {
+  background-color: #1e7e34;
+  box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  box-shadow: 0 6px 12px rgba(108, 117, 125, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-apply {
+  background-color: #6f42c1;
+  color: white;
+  padding: 12px 25px; /* Consistent with other buttons */
+  border-radius: 30px;
+  font-weight: bold;
+  box-shadow: 0 3px 6px rgba(111, 66, 193, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 1em;
+}
+
+.btn-apply:hover:not(:disabled) {
+  background-color: #5935a4;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(111, 66, 193, 0.4);
+}
+
+.btn-apply:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7; /* Slightly more opaque */
+  box-shadow: none;
+}
+
+/* Small buttons for status updates */
+.btn-small {
+  padding: 8px 15px;
+  font-size: 0.85em; /* Slightly smaller font */
+  border-radius: 6px; /* Match other rounded elements */
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
+  box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Form Styling (reused classes) */
+.job-post-form, .modal-content form {
+  /* Inherits card-layout styles */
+  background-color: #ffffff; /* Explicitly set for forms */
+}
+
+.form-group {
+  margin-bottom: 20px; /* Slightly more spacing */
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group input[type="number"],
+.form-group textarea,
+.form-group select {
+  width: calc(100% - 24px); /* Adjust for padding + border */
+  padding: 12px;
+  border: 1px solid #cce0ff; /* Lighter border color */
+  border-radius: 8px; /* Consistent rounded corners */
+  font-size: 1em;
+  color: #495057;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #80bdff;
+  outline: none; /* Remove default outline */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); /* Soft blue shadow on focus */
+}
+
+textarea {
+  min-height: 100px; /* Slightly taller default */
+}
+
+/* Modal for Apply Form */
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.6); /* Slightly darker overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px); /* Stronger blur */
+  -webkit-backdrop-filter: blur(8px); /* For Safari */
+}
+
+.modal-content {
+  /* Inherits card-layout styles */
+  background-color: #ffffff;
+  padding: 40px; /* More padding for spacious look */
+  max-width: 600px; /* Wider modal */
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3); /* Stronger shadow */
+  animation: fadeInModal 0.4s ease-out; /* Slightly longer animation */
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-content h2 {
+  font-size: 2em; /* Larger title */
+  margin-bottom: 30px;
+}
+
+.close-button {
+  color: #888; /* Softer close button color */
+  font-size: 36px; /* Larger close button */
+  position: absolute; /* Changed to absolute for precise positioning within modal-content */
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: #333;
+  transform: rotate(90deg); /* Slight rotation effect */
+}
+
+/* Horizontal rule for separation */
+hr {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0)); /* Softer gradient */
+  margin: 25px 0;
+}
+
+/* New styles for application actions and status */
+.application-actions {
+  margin-top: 20px; /* More spacing */
+  display: flex; /* Use flexbox for buttons */
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 10px; /* Space between buttons */
+}
+
+.status-pending {
+  color: #ffc107;
+  font-weight: bold;
+  background-color: rgba(255, 193, 7, 0.1); /* Light background for status */
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.status-accepted {
+  color: #28a745;
+  font-weight: bold;
+  background-color: rgba(40, 167, 69, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.status-declined {
+  color: #dc3545;
+  font-weight: bold;
+  background-color: rgba(220, 53, 69, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* Role hint small text (should have been removed in HTML already) */
+.role-hint {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #e9f0ff; /* Light blue hint background */
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #555;
+  font-style: italic;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 992px) { /* Tablets and smaller laptops */
+  .grid-container {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjust min width for smaller screens */
+  }
+  .section-header {
+    flex-direction: column; /* Stack heading and search bar vertically */
+    align-items: flex-start; /* Align items to the start */
+    margin-bottom: 20px;
+  }
+  .section-header h2 {
+    width: 100%; /* Take full width */
+    text-align: center; /* Center heading on smaller screens */
+    margin-bottom: 15px; /* Add space below heading */
+  }
+  .search-bar-container {
+    margin-left: 0; /* Remove left margin when stacked */
+    max-width: 100%; /* Allow search bar to take full width */
+  }
+}
+
+@media (max-width: 768px) { /* Tablets and mobile */
+  .job-portal-container {
+    padding: 15px;
+    margin: 10px auto;
+  }
+
+  .main-nav {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .nav-section {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .nav-button {
+    width: 100%;
+    font-size: 0.95em;
+    padding: 10px 15px;
+  }
+
+  .btn {
+    width: 100%; /* Full width buttons on small screens */
+    margin-bottom: 10px;
+  }
+
+  .manager-actions, .user-actions, .top-actions-bar {
+    flex-direction: column; /* Stack buttons/sections vertically */
+  }
+
+  .job-card, .application-card {
+    padding: 15px;
+    min-height: auto; /* Allow height to adjust */
+  }
+
+  .modal-content {
+    padding: 25px;
+    width: 95%;
+  }
+
+  .modal-content h2 {
+    font-size: 1.6em;
+  }
+
+  .close-button {
+    font-size: 30px;
+    top: 15px;
+    right: 15px;
+  }
+}
+
+@media (max-width: 480px) { /* Smaller mobile devices */
+  .job-portal-container {
+    padding: 10px;
+  }
+  .job-card h3, .application-card h3 {
+    font-size: 1.4em;
+  }
+  .modal-content {
+    padding: 20px;
+  }
+  .close-button {
+    font-size: 28px;
+    top: 10px;
+    right: 10px;
+  }
+}

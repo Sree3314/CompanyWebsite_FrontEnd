@@ -1,5 +1,214 @@
-<div class="page-container">
-    <h2>Job Portal</h2>
-    <p>Welcome to our Job Portal!</p>
-    <p>Explore current job openings and career opportunities with our company.</p>
+<div class="job-portal-container">
+  <nav class="main-nav">
+    <div *ngIf="isManager" class="nav-section manager-nav">
+      <button class="nav-button" [class.active]="!showJobPostForm && !showViewApplications" (click)="showAvailableJobsForManager()">
+        <i class="fas fa-briefcase"></i> Available Jobs
+      </button>
+      <button class="nav-button" [class.active]="showJobPostForm" (click)="toggleJobPostForm()">
+        <i class="fas fa-plus-circle"></i> Post a New Job
+      </button>
+      <button class="nav-button" [class.active]="showViewApplications" (click)="toggleViewApplications()">
+        <i class="fas fa-list-alt"></i> View All Applications
+      </button>
+    </div>
+
+    <div *ngIf="isUser" class="nav-section user-nav">
+      <button class="nav-button" [class.active]="!showMyApplications && !showJobPostForm && !showViewApplications" (click)="showMyApplications = false; showJobPostForm = false; showViewApplications = false; loadAllJobs()">
+        <i class="fas fa-briefcase"></i> Available Jobs
+      </button>
+      <button class="nav-button" [class.active]="showMyApplications" (click)="toggleMyApplications()">
+        <i class="fas fa-file-alt"></i> My Applications
+      </button>
+    </div>
+  </nav>
+
+  <hr>
+
+  <div *ngIf="isManager && showJobPostForm" class="job-post-form card-layout">
+    <h2>Post a New Job</h2>
+    <form (ngSubmit)="submitJob()">
+      <div class="form-group">
+        <label for="title">Title:</label>
+        <input type="text" id="title" [(ngModel)]="newJob.title" name="title" required>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea id="description" [(ngModel)]="newJob.description" name="description" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="location">Location:</label>
+        <input type="text" id="location" [(ngModel)]="newJob.location" name="location" required>
+      </div>
+
+      <div class="form-group">
+        <label for="salary">Salary:</label>
+        <input type="text" id="salary" [(ngModel)]="newJob.salary" name="salary" required>
+      </div>
+
+      <div class="form-group">
+        <label for="jobType">Job Type:</label>
+        <select id="jobType" [(ngModel)]="newJob.jobType" name="jobType" required>
+          <option value="">Select Type</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Contract">Contract</option>
+          <option value="Internship">Intern-ship</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="experienceLevel">Experience Level:</label>
+        <select id="experienceLevel" [(ngModel)]="newJob.experienceLevel" name="experienceLevel" required>
+          <option value="">Select Level</option>
+          <option value="Entry-level">Entry-level</option>
+          <option value="Mid">Mid</option>
+          <option value="Senior">Senior</option>
+          <option value="Lead">Lead</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="skillsRequired">Skills Required (comma-separated):</label>
+        <input type="text" id="skillsRequired" [(ngModel)]="newJob.skillsRequired" name="skillsRequired" required>
+      </div>
+
+      <button type="submit" class="btn btn-success">Post Job</button>
+      <button type="button" class="btn btn-secondary" (click)="toggleJobPostForm()">Cancel</button>
+    </form>
+    <p *ngIf="jobPostMessage" [class.success]="jobPostMessage.includes('successfully')"
+      [class.error]="jobPostMessage.includes('Error')">
+      {{ jobPostMessage }}
+    </p>
   </div>
+
+  <div *ngIf="isManager && showViewApplications" class="applications-list-container">
+    <div class="section-header">
+      <h2>All Job Applications</h2>
+      <div class="search-bar-container">
+        <input type="text" [(ngModel)]="applicationSearchQuery" (input)="onApplicationSearch()" placeholder="Search applications by applicant or job title..." class="form-control search-input">
+      </div>
+    </div>
+    <div *ngIf="filteredApplications.length === 0 && applicationSearchQuery" class="no-data">
+      <p>No applications found matching your search.</p>
+    </div>
+    <div *ngIf="allApplications.length === 0 && !applicationSearchQuery" class="no-data">
+      <p>No applications available at the moment.</p>
+    </div>
+    <ul class="application-list grid-container">
+      <li *ngFor="let application of filteredApplications" class="application-card card-layout">
+        <div class="card-details">
+          <h3>Application ID: {{ application.id }} for Job: {{ application.job.title || 'N/A' }} (ID: {{ application.job.id || 'N/A' }})</h3>
+          <p><strong>Applicant Name:</strong> {{ application.employee.firstName }} {{ application.employee.lastName || 'N/A' }} (ID: {{ application.employee.employeeId || 'N/A' }})</p>
+          <p><strong>Applicant Email:</strong> {{ application.employee.email || 'N/A' }}</p>
+          <p><strong>Resume Link:</strong> <a [href]="application.resumeLink" target="_blank">{{ application.resumeLink }}</a></p>
+          <p><strong>Skills:</strong> {{ application.skills }}</p>
+          <p><strong>Years of Experience:</strong> {{ application.yearsOfExperience }}</p>
+          <p><strong>Status:</strong> <span [class]="'status-' + application.status.toLowerCase()">{{ application.status }}</span></p>
+          <p><strong>Applied Date:</strong> {{ application.appliedDate | date:'mediumDate' }}</p>
+        </div>
+
+        <div class="application-actions">
+          <button
+            class="btn btn-success btn-small"
+            (click)="updateApplicationStatus(application.id, ApplicationStatus.ACCEPTED)"
+            [disabled]="application.status === ApplicationStatus.ACCEPTED"
+          >
+            Accept
+          </button>
+          <button
+            class="btn btn-danger btn-small"
+            (click)="updateApplicationStatus(application.id, ApplicationStatus.DECLINED)"
+            [disabled]="application.status === ApplicationStatus.DECLINED"
+          >
+            Decline
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="isUser && showMyApplications" class="my-applications-list-container applications-list-container">
+    <h2>My Job Applications</h2>
+    <div *ngIf="!(myApplications$ | async)" class="loading-message">
+      <p>Loading your applications...</p>
+    </div>
+    <div *ngIf="(myApplications$ | async)?.length === 0 && (myApplications$ | async)" class="no-data">
+      <p>You have not submitted any applications yet.</p>
+    </div>
+    <ul class="application-list grid-container">
+      <li *ngFor="let application of myApplications$ | async" class="application-card card-layout">
+        <div class="card-details">
+          <h3>Application for Job: {{ application.job.title || 'N/A' }} (ID: {{ application.job.id || 'N/A' }})</h3>
+          <p><strong>Your Resume Link:</strong> <a [href]="application.resumeLink" target="_blank">{{ application.resumeLink }}</a></p>
+          <p><strong>Your Skills:</strong> {{ application.skills }}</p>
+          <p><strong>Your Years of Experience:</strong> {{ application.yearsOfExperience }}</p>
+          <p><strong>Status:</strong> <span [class]="'status-' + application.status.toLowerCase()">{{ application.status }}</span></p>
+          <p><strong>Applied Date:</strong> {{ application.appliedDate | date:'mediumDate' }}</p>
+        </div>
+        </li>
+    </ul>
+  </div>
+
+  <div class="jobs-list-container" *ngIf="(!showViewApplications && !showMyApplications && !showJobPostForm) || (isManager && !showJobPostForm && !showViewApplications)">
+    <div class="section-header">
+      <h2>Available Jobs</h2>
+      <div class="search-bar-container">
+        <input type="text" [(ngModel)]="jobSearchQuery" (input)="onJobSearch()" placeholder="Search jobs by title, location, description, or skills..." class="form-control search-input">
+      </div>
+    </div>
+    <div *ngIf="!(filteredJobs$ | async)" class="loading-message">
+      <p>Loading jobs...</p>
+    </div>
+    <div *ngIf="(filteredJobs$ | async)?.length === 0 && (jobSearchQuery || (jobs$ | async)?.length === 0)" class="no-data">
+      <p *ngIf="jobSearchQuery">No jobs found matching your search.</p>
+      <p *ngIf="!jobSearchQuery && (jobs$ | async)?.length === 0">No jobs available at the moment.</p>
+    </div>
+    <ul class="job-list grid-container">
+      <li *ngFor="let job of filteredJobs$ | async" class="job-card card-layout">
+        <div class="card-details">
+          <h3>{{ job.title }}</h3>
+          <p><strong>Description:</strong> <span>{{ job.description }}</span></p>
+          <p><strong>Location:</strong> {{ job.location }}</p>
+          <p><strong>Salary:</strong> {{ job.salary }}</p>
+          <p><strong>Job Type:</strong> {{ job.jobType }}</p>
+          <p><strong>Experience Level:</strong> {{ job.experienceLevel }}</p>
+          <p><strong>Skills:</strong> {{ job.skillsRequired }}</p>
+          <p><strong>Posted Date:</strong> {{ job.postedDate | date:'mediumDate' }}</p>
+        </div>
+
+        <div class="job-actions">
+          <button *ngIf="isUser" class="btn btn-apply" (click)="openApplyForm(job)" [disabled]="hasApplied(job.id)">
+            {{ hasApplied(job.id) ? 'Applied' : 'Apply Now' }}
+          </button>
+          <button *ngIf="isManager" class="btn btn-danger" (click)="deleteJob(job.id!)">Delete Job</button>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="showApplyForm" class="modal">
+    <div class="modal-content card-layout">
+      <span class="close-button" (click)="closeApplyForm()">&times;</span>
+      <h2>Apply for {{ selectedJobForApplication?.title }}</h2>
+      <form (ngSubmit)="submitApplication()">
+        <div class="form-group">
+          <label for="resumeLink">Resume Link:</label>
+          <input type="url" id="resumeLink" [(ngModel)]="applicationFormData.resumeLink" name="resumeLink" required>
+        </div>
+        <div class="form-group">
+          <label for="skills">Your Skills (comma-separated):</label>
+          <input type="text" id="skills" [(ngModel)]="applicationFormData.skills" name="skills" required>
+        </div>
+        <div class="form-group">
+          <label for="yearsOfExperience">Years of Experience:</label>
+          <input type="number" id="yearsOfExperience" [(ngModel)]="applicationFormData.yearsOfExperience"
+            name="yearsOfExperience" required>
+        </div>
+        <button type="submit" class="btn btn-success">Submit Application</button>
+        <button type="button" class="btn btn-secondary" (click)="closeApplyForm()">Cancel</button>
+      </form>
+    </div>
+  </div>
+</div>
