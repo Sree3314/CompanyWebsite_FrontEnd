@@ -1,63 +1,105 @@
 <div class="form-container">
-    <!-- Sign In Form -->
-    <div *ngIf="!showSignUpForm">
-      <h2>Sign In</h2>
-      <form (ngSubmit)="onSignIn()">
-        <div class="form-group">
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" [(ngModel)]="signInData.email" required>
-        </div>
-        <div class="form-group">
-          <label for="password">Password:</label>
-          <input type="password" id="password" name="password" [(ngModel)]="signInData.password" required>
-        </div>
-        <button type="submit" (click)="onSignIn()">Sign In</button>
-      </form>
-      <p>Don't have an account? <button (click)="toggleForm()">Create Account</button></p>
-    </div>
-  
-    <!-- Sign Up Form -->
-    <div *ngIf="showSignUpForm">
-      <h2>Sign Up</h2>
-      <form (ngSubmit)="onSignUp()">
-        <div class="form-group">
-          <label for="employeeId">Employee ID:</label>
-          <input type="text" id="employeeId" name="employeeId" [(ngModel)]="signUpData.employeeId" required>
-        </div>
-        <div class="form-group">
-          <label for="firstName">First Name:</label>
-          <input type="text" id="firstName" name="firstName" [(ngModel)]="signUpData.firstName" required>
-        </div>
-        <div class="form-group">
-          <label for="lastName">Last Name:</label>
-          <input type="text" id="lastName" name="lastName" [(ngModel)]="signUpData.lastName" required>
-        </div>
-        <div class="form-group">
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" [(ngModel)]="signUpData.email" required>
-        </div>
-        <div class="form-group">
-          <label for="password">Password:</label>
-          <input type="password" id="password" name="password" [(ngModel)]="signUpData.password" required>
-        </div>
-        <div class="form-group">
-          <label for="contactInformation">Contact Information:</label>
-          <input type="text" id="contactInformation" name="contactInformation" [(ngModel)]="signUpData.contactInformation" required>
-        </div>
-        <div class="form-group">
-          <label for="department">Department:</label>
-          <input type="text" id="department" name="department" [(ngModel)]="signUpData.department" required>
-        </div>
-        <div class="form-group">
-          <label for="jobTitle">Job Title:</label>
-          <input type="text" id="jobTitle" name="jobTitle" [(ngModel)]="signUpData.jobTitle" required>
-        </div>
-        <div class="form-group">
-          <label for="personalEmail">Personal Email:</label>
-          <input type="email" id="personalEmail" name="personalEmail" [(ngModel)]="signUpData.personalEmail" required>
-        </div>
-        <button type="submit" click()="onSignUp()">Sign Up</button>
-        <p>Already have an account? <button (click)="toggleForm()">Sign In</button></p>
-      </form>
-    </div>
+  <div *ngIf="!showSignUpForm && !showForgotPasswordForm && !showResetPasswordForm">
+    <h2>Sign In</h2>
+    <form (ngSubmit)="onSignIn()">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" [(ngModel)]="signInData.email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" [(ngModel)]="signInData.password" required>
+      </div>
+      <button type="submit">Sign In</button>
+    </form>
+    <p>Don't have an account? <button (click)="toggleForm()">Create Account</button></p>
+    <p><button (click)="goToForgotPassword()" class="forgot-password-link">Forgot Password?</button></p>
+
+    <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+    <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
   </div>
+
+  <div *ngIf="showSignUpForm">
+    <h2>Sign Up</h2>
+    <form (ngSubmit)="onSignUp()">
+      <div class="form-group">
+        <label for="employeeId">Employee ID:</label>
+        <input type="number" id="employeeId" name="employeeId" [(ngModel)]="signUpData.employeeId" required>
+      </div>
+      <div class="form-group">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" [(ngModel)]="signUpData.firstName" required>
+      </div>
+      <div class="form-group">
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" [(ngModel)]="signUpData.lastName" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" [(ngModel)]="signUpData.email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" [(ngModel)]="signUpData.password" required>
+      </div>
+      <div class="form-group">
+        <label for="contactInformation">Contact Information:</label>
+        <input type="text" id="contactInformation" name="contactInformation" [(ngModel)]="signUpData.contactInformation" required>
+      </div>
+      <div class="form-group">
+        <label for="department">Department:</label>
+        <input type="text" id="department" name="department" [(ngModel)]="signUpData.department" required>
+      </div>
+      <div class="form-group">
+        <label for="jobTitle">Job Title:</label>
+        <input type="text" id="jobTitle" name="jobTitle" [(ngModel)]="signUpData.jobTitle" required>
+      </div>
+      <div class="form-group">
+        <label for="personalEmail">Personal Email:</label>
+        <input type="email" id="personalEmail" name="personalEmail" [(ngModel)]="signUpData.personalEmail" required>
+      </div>
+      <button type="submit">Sign Up</button>
+      <p>Already have an account? <button (click)="toggleForm()">Sign In</button></p>
+    </form>
+    <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+    <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
+  </div>
+
+  <div *ngIf="showForgotPasswordForm">
+    <h2>Forgot Password</h2>
+    <p>Enter your personal email to receive a password reset OTP.</p>
+    <form (ngSubmit)="onRequestOtp()">
+      <div class="form-group">
+        <label for="forgotPasswordEmail">Personal Email:</label>
+        <input type="email" id="forgotPasswordEmail" name="forgotPasswordEmail" [(ngModel)]="forgotPasswordEmail" required>
+      </div>
+      <button type="submit">Send OTP</button>
+      <p><button (click)="backToSignIn()">Back to Sign In</button></p>
+    </form>
+    <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+    <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
+  </div>
+
+  <div *ngIf="showResetPasswordForm">
+    <h2>Reset Password</h2>
+    <p>Enter the OTP sent to your personal email and your new password.</p>
+    <form (ngSubmit)="onResetPassword()">
+      <div class="form-group">
+        <label for="orgEmail">Organization Email:</label>
+        <input type="email" id="orgEmail" name="orgEmail" [(ngModel)]="resetPasswordData.organizationEmail" required>
+      </div>
+      <div class="form-group">
+        <label for="otp">OTP:</label>
+        <input type="text" id="otp" name="otp" [(ngModel)]="resetPasswordData.token" required maxlength="6">
+      </div>
+      <div class="form-group">
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword" name="newPassword" [(ngModel)]="resetPasswordData.newPassword" required>
+      </div>
+      <button type="submit">Reset Password</button>
+      <p><button (click)="backToSignIn()">Back to Sign In</button></p>
+    </form>
+    <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+    <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
+  </div>
+</div>

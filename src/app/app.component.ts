@@ -17,3 +17,4 @@ export class AppComponent {
   title = 'Company Homepage';
   image = "assets/company.png"; // Path to your logo image
 }
+ 
