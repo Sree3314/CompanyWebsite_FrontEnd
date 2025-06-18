@@ -1,0 +1,70 @@
+<!-- Main container for the Exhibition Details Page -->
+<div class="page-container">
+  <!-- Loading, Error, or No Item Display -->
+  <div *ngIf="loading" class="message loading">Loading exhibition details...</div>
+  <div *ngIf="error" class="message error">{{ error }}</div>
+
+  <!-- Display details only if exhibitionItem is loaded and no error -->
+  <div *ngIf="!loading && !error && exhibitionItem" class="details-card">
+    <button class="back-button" (click)="goBack()">← Back to Exhibition</button>
+
+    <h2 class="item-title">{{ exhibitionItem.title }}</h2>
+    <p class="item-description">{{ exhibitionItem.description }}</p>
+
+    <div class="item-meta">
+      <p><strong>Uploader:</strong> {{ uploaderFullName }}</p>
+      <p><strong>Employee ID:</strong> {{ exhibitionItem.externalEmployeeId }}</p>
+      <p><strong>Upload Date:</strong> {{ exhibitionItem.uploadDate | date }}</p>
+      <p *ngIf="exhibitionItem.projectDuration"><strong>Project Duration:</strong> {{ exhibitionItem.projectDuration }}</p>
+      <p *ngIf="exhibitionItem.startedDate && exhibitionItem.endDate">
+        <strong>Project Dates:</strong> {{ exhibitionItem.startedDate | date }} to {{ exhibitionItem.endDate | date }}
+      </p>
+      <p *ngIf="exhibitionItem.fileUrl">
+        <!-- Using a button that calls openFileUrl() -->
+        <button class="view-file-button" (click)="openFileUrl()">View File</button>
+      </p>
+    </div>
+
+    <!-- Current Rating & Comment Display -->
+    <div class="current-feedback">
+      <p *ngIf="exhibitionItem.rating"><strong>Current Rating:</strong> {{ exhibitionItem.rating }} / 5</p>
+      <p *ngIf="exhibitionItem.comment"><strong>Current Comment:</strong> "{{ exhibitionItem.comment }}"</p>
+      <p *ngIf="!exhibitionItem.rating && !exhibitionItem.comment && !isManager">No ratings or comments yet.</p>
+    </div>
+
+    <!-- Manager-specific Rating and Commenting Section -->
+    <div *ngIf="isManager" class="manager-actions">
+      <h3>Manager Actions</h3>
+
+      <!-- Rating Component -->
+      <div class="rating-section">
+        <label for="newRating">Rate this work (1-5):</label>
+        <input
+          id="newRating"
+          type="number"
+          min="1"
+          max="5"
+          [(ngModel)]="newRating"
+          class="rating-input"
+          placeholder="Enter rating"
+        />
+        <button class="action-button primary" (click)="submitRating()">Submit Rating</button>
+        <p *ngIf="ratingMessage" class="message">{{ ratingMessage }}</p>
+      </div>
+
+      <!-- Comment Input Component -->
+      <div class="comment-section">
+        <label for="newComment">Leave a comment:</label>
+        <textarea
+          id="newComment"
+          [(ngModel)]="newComment"
+          rows="4"
+          class="comment-textarea"
+          placeholder="Enter your comment here..."
+        ></textarea>
+        <button class="action-button primary" (click)="submitComment()">Submit Comment</button>
+        <p *ngIf="commentMessage" class="message">{{ commentMessage }}</p>
+      </div>
+    </div>
+  </div>
+</div>

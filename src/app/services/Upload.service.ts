@@ -27,7 +27,7 @@ export class UploadService {
    * @param uploadId The ID of the upload to delete.
    * @returns An Observable that completes when the deletion is successful (no specific data returned).
    */
-  deleteUpload(uploadId: string): Observable<void> {
+  deleteUpload(uploadId: number): Observable<void> {
     const url = `${this.apiUrl}/${uploadId}`;
     console.log('Deleting upload from:', url);
     return this.http.delete<void>(url); // <void> indicates no response body is expected
