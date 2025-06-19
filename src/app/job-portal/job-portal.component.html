@@ -222,45 +222,22 @@
       <span class="close-button text-gray-500 hover:text-gray-900 absolute top-5 right-5 text-4xl cursor-pointer transition-all duration-200" (click)="closeApplyForm()">&times;</span>
       <h2 class="text-3xl font-bold mb-8 text-gray-800">Apply for {{ selectedJobForApplication?.title }}</h2>
       <form (ngSubmit)="submitApplication()">
-        <p *ngIf="applicationMessage && !applicationFormErrors.resumeLink && !applicationFormErrors.skills && !applicationFormErrors.yearsOfExperience"
-           class="mb-4 p-3 rounded-md text-sm"
-           [class.bg-green-100]="applicationMessage.includes('successfully')"
-           [class.text-green-700]="applicationMessage.includes('successfully')"
-           [class.border-green-400]="applicationMessage.includes('successfully')"
-           [class.bg-red-100]="!applicationMessage.includes('successfully')"
-           [class.text-red-700]="!applicationMessage.includes('successfully')"
-           [class.border-red-400]="!applicationMessage.includes('successfully')">
-          {{ applicationMessage }}
-        </p>
-
         <div class="form-group mb-4">
           <label for="resumeLink" class="block text-gray-700 text-sm font-semibold mb-2">Resume Link:</label>
           <input type="url" id="resumeLink" [(ngModel)]="applicationFormData.resumeLink" name="resumeLink" required
-                 class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
-                 [class.border-red-500]="applicationFormErrors.resumeLink"> <span *ngIf="applicationFormErrors.resumeLink" class="error-message text-red-600 text-xs italic mt-1">
-            {{ applicationFormErrors.resumeLink }}
-          </span>
-        </div>
-
+                 class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+          </div>
         <div class="form-group mb-4">
           <label for="skills" class="block text-gray-700 text-sm font-semibold mb-2">Your Skills (comma-separated):</label>
           <input type="text" id="skills" [(ngModel)]="applicationFormData.skills" name="skills" required
-                 class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
-                 [class.border-red-500]="applicationFormErrors.skills"> <span *ngIf="applicationFormErrors.skills" class="error-message text-red-600 text-xs italic mt-1">
-            {{ applicationFormErrors.skills }}
-          </span>
-        </div>
-
+                 class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+          </div>
         <div class="form-group mb-6">
           <label for="yearsOfExperience" class="block text-gray-700 text-sm font-semibold mb-2">Years of Experience:</label>
           <input type="number" id="yearsOfExperience" [(ngModel)]="applicationFormData.yearsOfExperience"
                  name="yearsOfExperience" required
-                 class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
-                 [class.border-red-500]="applicationFormErrors.yearsOfExperience"> <span *ngIf="applicationFormErrors.yearsOfExperience" class="error-message text-red-600 text-xs italic mt-1">
-            {{ applicationFormErrors.yearsOfExperience }}
-          </span>
-        </div>
-
+                 class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+          </div>
         <div class="flex items-center justify-end space-x-4">
           <button type="submit" class="btn btn-success px-6 py-3 rounded-full text-lg font-semibold hover:scale-105 transition duration-300">
             Submit Application
