@@ -24,6 +24,10 @@ export const routes: Routes = [
   // Redirect to the home path when the URL is empty
   { path: '', redirectTo: '/home', pathMatch: 'full' },
 
+  { path: 'exhibition/:id', loadComponent: () => import('./exhibition-details/exhibition-details.component').then(m => m.ExhibitionDetailsComponent) },
+
   // Redirect any unknown paths to the home path (this is now safe because /home is defined)
   { path: '**', redirectTo: '/home' }
+  // Assuming ExhibitionComponent route is already defined, this adds the details route
+
 ];

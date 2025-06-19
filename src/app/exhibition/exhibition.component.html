@@ -1,5 +1,56 @@
+<!-- Main container for the Exhibition Listing Page -->
 <div class="page-container">
-    <h2>Exhibition Details</h2>
-    <p>Information about our upcoming and past exhibitions will be displayed here.</p>
-    <p>Stay tuned for event dates and locations!</p>
+  <h2 class="page-title">Company Exhibition</h2>
+  <p class="page-description">Explore innovative projects and achievements from our talented employees.</p>
+
+  <!-- Filter Controls Section -->
+  <div class="filter-controls">
+    <!-- Dropdown to select filter type -->
+    <div class="filter-group">
+      <label for="filterType">Filter By:</label>
+      <select id="filterType" [(ngModel)]="filterType" class="filter-select">
+        <option value="none">No Filter</option>
+        <option value="employeeId">Employee ID</option>
+        <option value="firstName">First Name</option>
+      </select>
+    </div>
+
+    <!-- Input field for filter value, conditionally displayed based on filterType -->
+    <div class="filter-group" *ngIf="filterType !== 'none'">
+      <label for="filterValue">Enter Value:</label>
+      <input
+        id="filterValue"
+        [type]="filterType === 'employeeId' ? 'number' : 'text'"
+        [(ngModel)]="filterValue"
+        [placeholder]="filterType === 'employeeId' ? 'e.g., 1001' : 'e.g., John'"
+        class="filter-input"
+      />
+    </div>
+
+    <!-- Action buttons for filters -->
+    <div class="filter-actions">
+      <button class="filter-button apply" (click)="fetchExhibitionItems()">Search</button>
+      <button class="filter-button clear" (click)="clearFilters()">Clear Filters</button>
+    </div>
   </div>
+
+  <!-- Loading, Error, or No Items Display -->
+  <div *ngIf="loading" class="message loading">Loading exhibition items...</div>
+  <div *ngIf="error" class="message error">{{ error }}</div>
+  <div *ngIf="!loading && !error && exhibitionItems.length === 0" class="message no-items">
+    No exhibition items found based on current filters.
+  </div>
+
+  <!-- Exhibition Items Grid -->
+  <div class="exhibition-grid">
+    <div *ngIf="!loading && !error && exhibitionItems.length > 0">
+      <!-- Direct rendering of exhibition items using a custom class for styling -->
+      <div *ngFor="let item of exhibitionItems" class="basic-exhibition-card">
+        <h4 class="card-title">{{item.title}}</h4>
+        <p class="card-description">{{item.description}}</p>
+        <small class="card-uploader">{{uploaderFullName(item)}}</small><br>
+        <button class="card-details-button" (click)="onViewDetails(item.uploadId)">View Details</button>
+      </div>
+    </div>
+  </div>
+</div>

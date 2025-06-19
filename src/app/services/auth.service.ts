@@ -3,9 +3,16 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, tap, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
+
  
 import { SignInRequest, SignInResponse, SignUpRequest ,MessageResponse,ResetPasswordRequest} from '../models/auth.model';
- 
+
+import { jwtDecode } from 'jwt-decode';
+
+// IMPORTANT: Import your models from the correct path
+import { SignInRequest, SignInResponse, SignUpRequest, MessageResponse, ResetPasswordRequest } from '../models/auth.model';
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -14,12 +21,20 @@ export class AuthService {
   private readonly EMPLOYEE_ID_KEY = 'employeeId'; // Define a key for employeeId in localStorage
   private readonly USER_EMAIL_KEY = 'userEmail';
   private readonly USER_ROLES_KEY = 'userRoles';
+
  
   private apiUrl = 'http://localhost:8089/api/auth'; // Base URL for your auth API
  
   private _isLoggedIn$: BehaviorSubject<boolean>;
   isLoggedIn$: Observable<boolean>;
  
+
+  private apiUrl = 'http://localhost:8089/api/auth'; // Base URL for your auth API
+
+  private _isLoggedIn$: BehaviorSubject<boolean>;
+  isLoggedIn$: Observable<boolean>;
+
+
   private _currentUserAutoId: number | null = null;
   private _currentUserRoles: string[] = [];
  
@@ -30,10 +45,15 @@ export class AuthService {
   ) {
     this._isLoggedIn$ = new BehaviorSubject<boolean>(this.hasTokenInLocalStorage());
     this.isLoggedIn$ = this._isLoggedIn$.asObservable();
- 
+
     this.loadUserFromLocalStorage();
   }
  
+
+
+    this.loadUserFromLocalStorage();
+  }
+
   private hasTokenInLocalStorage(): boolean {
     if (isPlatformBrowser(this.platformId)) {
       return !!localStorage.getItem(this.TOKEN_KEY);
@@ -55,7 +75,7 @@ export class AuthService {
     const storedEmail = localStorage.getItem(this.USER_EMAIL_KEY);
     const storedRoles = localStorage.getItem(this.USER_ROLES_KEY);
     const storedEmployeeId = localStorage.getItem(this.EMPLOYEE_ID_KEY); // Retrieve employeeId using its constant key
- 
+
     if (storedToken && storedEmail && storedRoles && storedEmployeeId) {
       this._currentUserAutoId = parseInt(storedEmployeeId, 10); // Parse to number
       this._currentUserRoles = JSON.parse(storedRoles);
@@ -88,11 +108,19 @@ export class AuthService {
               console.warn('SignIn response is missing employeeId. Current user ID will not be set correctly.');
             }
           }
+
  
           // NEW: Use the actual employeeId from the response
           this._currentUserAutoId = response.employeeId || null; // Use employeeId from response, default to null
           this._currentUserRoles = response.roles;
  
+
+
+          // NEW: Use the actual employeeId from the response
+          this._currentUserAutoId = response.employeeId || null; // Use employeeId from response, default to null
+          this._currentUserRoles = response.roles;
+
+
           this._isLoggedIn$.next(true);
           console.log('SignIn successful. Token and user details stored. Employee ID:', this._currentUserAutoId);
         } else {
@@ -168,7 +196,7 @@ export class AuthService {
   getCurrentUserRoles(): Observable<string[]> {
     return of(this._currentUserRoles);
   }
-   
+
   /**
    * Sends a request to initiate password reset (send OTP).
    * @param personalEmail The user's personal email to send OTP to.
@@ -177,7 +205,67 @@ export class AuthService {
   forgotPassword(personalEmail: string): Observable<MessageResponse> {
     return this.http.post<MessageResponse>(`${this.apiUrl}/forgot-password`, { personalEmail: personalEmail });
   }
- 
+
+
+  getUserRoles(): string[] {
+    if (isPlatformBrowser(this.platformId)) {
+      const storedRoles = localStorage.getItem('userRoles');
+      console.log('AuthService.getUserRoles(): Raw roles from localStorage:', storedRoles); // Debug log
+      if (storedRoles) {
+        try {
+          const roles = JSON.parse(storedRoles);
+          if (Array.isArray(roles) && roles.every(role => typeof role === 'string')) {
+            console.log('AuthService.getUserRoles(): Parsed roles:', roles); // Debug log
+            return roles; // Expecting roles like ["MANAGER", "USER"] directly
+          }
+          console.warn('AuthService.getUserRoles(): Stored "userRoles" is not a valid string array:', roles); // Warn
+          return [];
+        } catch (e) {
+          console.error('AuthService.getUserRoles(): Error parsing "userRoles" from localStorage:', e); // Error
+          return [];
+        }
+      }
+    }
+    console.log('AuthService.getUserRoles(): No "userRoles" found in localStorage or not in browser.'); // Debug log
+    return [];
+  }
+
+  /**
+   * Checks if the current user has the 'MANAGER' role.
+   * @returns True if the user has the MANAGER role, false otherwise.
+   */
+  isManager(): boolean {
+    const roles = this.getUserRoles();
+    const isMgr = roles.includes('MANAGER'); // Check if 'MANAGER' string exists in the array
+    console.log('AuthService.isManager(): Result:', isMgr, ' (Roles:', roles, ')'); // Debug log
+    return isMgr;
+  }
+
+  getCurrentUserName(): string | null {
+    if (isPlatformBrowser(this.platformId)) {
+        return localStorage.getItem('userEmail'); // Assuming email is fine for display name
+    }
+    return null;
+  }
+
+  getEmployeeIdFromToken(): number | null {
+    const token = this.getToken();
+    if (!token) {
+      return null;
+    }
+    try {
+      const decodedToken: any = jwtDecode(token);
+      if (typeof decodedToken.employeeId === 'number') {
+        return decodedToken.employeeId;
+      }
+      return null;
+    } catch (e) {
+      console.error('AuthService: Error decoding token for employeeId:', e);
+      this.logout(false);
+      return null;
+    }
+  }
+
   /**
    * Sends a request to reset the password using OTP.
    * @param resetRequest DTO containing organization email, OTP (token), and new password.

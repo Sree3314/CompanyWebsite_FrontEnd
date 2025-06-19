@@ -59,7 +59,7 @@
         <input type="email" id="personalEmail" name="personalEmail" [(ngModel)]="signUpData.personalEmail" required>
       </div>
       <button type="submit">Sign Up</button>
-      <p>Already have an account? <button (click)="toggleForm()">Sign In</button></p>
+      <p>Already have an account? <button type="button" (click)="toggleForm()">Sign In</button></p>
     </form>
     <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
     <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
@@ -74,7 +74,7 @@
         <input type="email" id="forgotPasswordEmail" name="forgotPasswordEmail" [(ngModel)]="forgotPasswordEmail" required>
       </div>
       <button type="submit">Send OTP</button>
-      <p><button (click)="backToSignIn()">Back to Sign In</button></p>
+      <p><button type="button" (click)="backToSignIn()">Back to Sign In</button></p>
     </form>
     <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
     <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
