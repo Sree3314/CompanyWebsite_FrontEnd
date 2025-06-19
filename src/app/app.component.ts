@@ -22,7 +22,7 @@ import { Subscription } from 'rxjs'; // Import Subscription to manage the subscr
 })
 export class AppComponent {
   title = 'Company Homepage';
-
+  image = "assets/company.png"; 
   isLoggedIn: boolean = false; // This property will hold the current login status
   private authSubscription: Subscription | undefined; // To store and manage the subscription
 
@@ -52,7 +52,7 @@ export class AppComponent {
   }
 }
 
-  image = "assets/company.png"; // Path to your logo image
-}
+  // Path to your logo image
+
  
 

@@ -24,63 +24,92 @@
 
   <hr>
 
-  <div *ngIf="isManager && showJobPostForm" class="job-post-form card-layout">
-    <h2>Post a New Job</h2>
+  <div *ngIf="isManager && showJobPostForm" class="job-post-form card-layout p-6 bg-white rounded-lg shadow-md mt-5">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Post a New Job</h2>
     <form (ngSubmit)="submitJob()">
-      <div class="form-group">
-        <label for="title">Title:</label>
-        <input type="text" id="title" [(ngModel)]="newJob.title" name="title" required>
+      <p *ngIf="jobPostMessage" [class.success]="jobPostMessage.includes('successfully')"
+         [class.error]="!jobPostMessage.includes('successfully')"
+         class="mb-4 p-3 rounded-md text-sm"
+         [class.bg-green-100]="jobPostMessage.includes('successfully')"
+         [class.text-green-700]="jobPostMessage.includes('successfully')"
+         [class.border-green-400]="jobPostMessage.includes('successfully')"
+         [class.bg-red-100]="!jobPostMessage.includes('successfully')"
+         [class.text-red-700]="!jobPostMessage.includes('successfully')"
+         [class.border-red-400]="!jobPostMessage.includes('successfully')"
+      >
+        {{ jobPostMessage }}
+      </p>
+
+      <div class="form-group mb-4">
+        <label for="title" class="block text-gray-700 text-sm font-semibold mb-2">Title:</label>
+        <input type="text" id="title" [(ngModel)]="newJob.title" name="title" required
+               class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+        <span *ngIf="jobFormErrors.title" class="error-message text-red-600 text-xs italic mt-1">{{ jobFormErrors.title }}</span>
       </div>
 
-      <div class="form-group">
-        <label for="description">Description:</label>
-        <textarea id="description" [(ngModel)]="newJob.description" name="description" required></textarea>
+      <div class="form-group mb-4">
+        <label for="description" class="block text-gray-700 text-sm font-semibold mb-2">Description:</label>
+        <textarea id="description" [(ngModel)]="newJob.description" name="description" required
+                  class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 h-24"></textarea>
+        <span *ngIf="jobFormErrors.description" class="error-message text-red-600 text-xs italic mt-1">{{ jobFormErrors.description }}</span>
       </div>
 
-      <div class="form-group">
-        <label for="location">Location:</label>
-        <input type="text" id="location" [(ngModel)]="newJob.location" name="location" required>
+      <div class="form-group mb-4">
+        <label for="location" class="block text-gray-700 text-sm font-semibold mb-2">Location:</label>
+        <input type="text" id="location" [(ngModel)]="newJob.location" name="location" required
+               class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+        <span *ngIf="jobFormErrors.location" class="error-message text-red-600 text-xs italic mt-1">{{ jobFormErrors.location }}</span>
       </div>
 
-      <div class="form-group">
-        <label for="salary">Salary:</label>
-        <input type="text" id="salary" [(ngModel)]="newJob.salary" name="salary" required>
+      <div class="form-group mb-4">
+        <label for="salary" class="block text-gray-700 text-sm font-semibold mb-2">Salary:</label>
+        <input type="text" id="salary" [(ngModel)]="newJob.salary" name="salary" required
+               class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+        <span *ngIf="jobFormErrors.salary" class="error-message text-red-600 text-xs italic mt-1">{{ jobFormErrors.salary }}</span>
       </div>
 
-      <div class="form-group">
-        <label for="jobType">Job Type:</label>
-        <select id="jobType" [(ngModel)]="newJob.jobType" name="jobType" required>
+      <div class="form-group mb-4">
+        <label for="jobType" class="block text-gray-700 text-sm font-semibold mb-2">Job Type:</label>
+        <select id="jobType" [(ngModel)]="newJob.jobType" name="jobType" required
+                class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
           <option value="">Select Type</option>
           <option value="Full-time">Full-time</option>
           <option value="Part-time">Part-time</option>
           <option value="Contract">Contract</option>
           <option value="Internship">Intern-ship</option>
         </select>
+        <span *ngIf="jobFormErrors.jobType" class="error-message text-red-600 text-xs italic mt-1">{{ jobFormErrors.jobType }}</span>
       </div>
 
-      <div class="form-group">
-        <label for="experienceLevel">Experience Level:</label>
-        <select id="experienceLevel" [(ngModel)]="newJob.experienceLevel" name="experienceLevel" required>
+      <div class="form-group mb-4">
+        <label for="experienceLevel" class="block text-gray-700 text-sm font-semibold mb-2">Experience Level:</label>
+        <select id="experienceLevel" [(ngModel)]="newJob.experienceLevel" name="experienceLevel" required
+                class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
           <option value="">Select Level</option>
           <option value="Entry-level">Entry-level</option>
           <option value="Mid">Mid</option>
           <option value="Senior">Senior</option>
           <option value="Lead">Lead</option>
         </select>
+        <span *ngIf="jobFormErrors.experienceLevel" class="error-message text-red-600 text-xs italic mt-1">{{ jobFormErrors.experienceLevel }}</span>
       </div>
 
-      <div class="form-group">
-        <label for="skillsRequired">Skills Required (comma-separated):</label>
-        <input type="text" id="skillsRequired" [(ngModel)]="newJob.skillsRequired" name="skillsRequired" required>
+      <div class="form-group mb-6">
+        <label for="skillsRequired" class="block text-gray-700 text-sm font-semibold mb-2">Skills Required (comma-separated):</label>
+        <input type="text" id="skillsRequired" [(ngModel)]="newJob.skillsRequired" name="skillsRequired" required
+               class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+        <span *ngIf="jobFormErrors.skillsRequired" class="error-message text-red-600 text-xs italic mt-1">{{ jobFormErrors.skillsRequired }}</span>
       </div>
 
-      <button type="submit" class="btn btn-success">Post Job</button>
-      <button type="button" class="btn btn-secondary" (click)="toggleJobPostForm()">Cancel</button>
+      <div class="flex items-center justify-end space-x-4">
+        <button type="submit" class="btn btn-success px-6 py-3 rounded-full text-lg font-semibold hover:scale-105 transition duration-300">
+          Post Job
+        </button>
+        <button type="button" class="btn btn-secondary px-6 py-3 rounded-full text-lg font-semibold hover:scale-105 transition duration-300" (click)="toggleJobPostForm()">
+          Cancel
+        </button>
+      </div>
     </form>
-    <p *ngIf="jobPostMessage" [class.success]="jobPostMessage.includes('successfully')"
-      [class.error]="jobPostMessage.includes('Error')">
-      {{ jobPostMessage }}
-    </p>
   </div>
 
   <div *ngIf="isManager && showViewApplications" class="applications-list-container">
@@ -179,35 +208,67 @@
         </div>
 
         <div class="job-actions">
-          <button *ngIf="isUser" class="btn btn-apply" (click)="openApplyForm(job)" [disabled]="hasApplied(job.id)">
-            {{ hasApplied(job.id) ? 'Applied' : 'Apply Now' }}
-          </button>
+          <button *ngIf="isUser" class="btn btn-apply" (click)="openApplyForm(job)" [disabled]="hasApplied(job.id)">
+            {{ hasApplied(job.id) ? 'Applied' : 'Apply Now' }}
+          </button>
           <button *ngIf="isManager" class="btn btn-danger" (click)="deleteJob(job.id!)">Delete Job</button>
-        </div>
+        </div>
       </li>
     </ul>
   </div>
 
-  <div *ngIf="showApplyForm" class="modal">
-    <div class="modal-content card-layout">
-      <span class="close-button" (click)="closeApplyForm()">&times;</span>
-      <h2>Apply for {{ selectedJobForApplication?.title }}</h2>
+  <div *ngIf="showApplyForm" class="modal fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center backdrop-blur-md z-50">
+    <div class="modal-content card-layout bg-white p-10 rounded-lg shadow-2xl relative animate-fadeInModal max-w-xl w-full">
+      <span class="close-button text-gray-500 hover:text-gray-900 absolute top-5 right-5 text-4xl cursor-pointer transition-all duration-200" (click)="closeApplyForm()">&times;</span>
+      <h2 class="text-3xl font-bold mb-8 text-gray-800">Apply for {{ selectedJobForApplication?.title }}</h2>
       <form (ngSubmit)="submitApplication()">
-        <div class="form-group">
-          <label for="resumeLink">Resume Link:</label>
-          <input type="url" id="resumeLink" [(ngModel)]="applicationFormData.resumeLink" name="resumeLink" required>
+        <p *ngIf="applicationMessage && !applicationFormErrors.resumeLink && !applicationFormErrors.skills && !applicationFormErrors.yearsOfExperience"
+           class="mb-4 p-3 rounded-md text-sm"
+           [class.bg-green-100]="applicationMessage.includes('successfully')"
+           [class.text-green-700]="applicationMessage.includes('successfully')"
+           [class.border-green-400]="applicationMessage.includes('successfully')"
+           [class.bg-red-100]="!applicationMessage.includes('successfully')"
+           [class.text-red-700]="!applicationMessage.includes('successfully')"
+           [class.border-red-400]="!applicationMessage.includes('successfully')">
+          {{ applicationMessage }}
+        </p>
+
+        <div class="form-group mb-4">
+          <label for="resumeLink" class="block text-gray-700 text-sm font-semibold mb-2">Resume Link:</label>
+          <input type="url" id="resumeLink" [(ngModel)]="applicationFormData.resumeLink" name="resumeLink" required
+                 class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
+                 [class.border-red-500]="applicationFormErrors.resumeLink"> <span *ngIf="applicationFormErrors.resumeLink" class="error-message text-red-600 text-xs italic mt-1">
+            {{ applicationFormErrors.resumeLink }}
+          </span>
         </div>
-        <div class="form-group">
-          <label for="skills">Your Skills (comma-separated):</label>
-          <input type="text" id="skills" [(ngModel)]="applicationFormData.skills" name="skills" required>
+
+        <div class="form-group mb-4">
+          <label for="skills" class="block text-gray-700 text-sm font-semibold mb-2">Your Skills (comma-separated):</label>
+          <input type="text" id="skills" [(ngModel)]="applicationFormData.skills" name="skills" required
+                 class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
+                 [class.border-red-500]="applicationFormErrors.skills"> <span *ngIf="applicationFormErrors.skills" class="error-message text-red-600 text-xs italic mt-1">
+            {{ applicationFormErrors.skills }}
+          </span>
         </div>
-        <div class="form-group">
-          <label for="yearsOfExperience">Years of Experience:</label>
+
+        <div class="form-group mb-6">
+          <label for="yearsOfExperience" class="block text-gray-700 text-sm font-semibold mb-2">Years of Experience:</label>
           <input type="number" id="yearsOfExperience" [(ngModel)]="applicationFormData.yearsOfExperience"
-            name="yearsOfExperience" required>
+                 name="yearsOfExperience" required
+                 class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
+                 [class.border-red-500]="applicationFormErrors.yearsOfExperience"> <span *ngIf="applicationFormErrors.yearsOfExperience" class="error-message text-red-600 text-xs italic mt-1">
+            {{ applicationFormErrors.yearsOfExperience }}
+          </span>
         </div>
-        <button type="submit" class="btn btn-success">Submit Application</button>
-        <button type="button" class="btn btn-secondary" (click)="closeApplyForm()">Cancel</button>
+
+        <div class="flex items-center justify-end space-x-4">
+          <button type="submit" class="btn btn-success px-6 py-3 rounded-full text-lg font-semibold hover:scale-105 transition duration-300">
+            Submit Application
+          </button>
+          <button type="button" class="btn btn-secondary px-6 py-3 rounded-full text-lg font-semibold hover:scale-105 transition duration-300" (click)="closeApplyForm()">
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   </div>

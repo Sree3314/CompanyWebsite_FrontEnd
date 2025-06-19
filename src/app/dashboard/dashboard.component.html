@@ -1,7 +1,9 @@
+
+
 <div class="dashboard-container min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-sans relative flex justify-center items-start py-10">
-
+ 
   <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col md:flex-row text-center transform transition-transform duration-300 hover:scale-[1.005]">
-
+ 
     <div class="md:w-1/3 flex flex-col items-center md:items-start p-4 border-b md:border-b-0 md:border-r border-gray-200 mb-6 md:mb-0 md:pr-8">
       <div class="relative mb-6">
         <img *ngIf="userDetails?.profilePictureUrl && userDetails; else defaultProfile"
@@ -14,11 +16,13 @@
                class="w-32 h-32 rounded-full object-cover shadow-lg border-4 border-white transform transition-transform duration-300 hover:scale-105">
         </ng-template>
       </div>
+      <!-- Removed optional chaining as userDetails is guaranteed by outer *ngIf -->
       <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
         {{ userDetails?.firstName || 'Welcome' }} {{ userDetails?.lastName || '' }}
       </h2>
+      <!-- Removed optional chaining -->
       <p class="text-md text-indigo-600 font-semibold mb-6">{{ userDetails?.jobTitle || 'Employee' }}</p>
-
+ 
       <div class="flex flex-col space-y-3 w-full">
         <button (click)="toggleEditMode()"
                 class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-75">
@@ -34,27 +38,28 @@
         </button>
       </div>
     </div>
-
+ 
     <div class="md:w-2/3 md:pl-8 flex flex-col justify-between">
-      <div *ngIf="successMessage"
+      <!-- General success/error messages at the top of this main section -->
+      <div *ngIf="successMessage && !showUploadForm"
            class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
         <span class="block sm:inline">{{ successMessage }}</span>
       </div>
-      <div *ngIf="errorMessage"
+      <div *ngIf="errorMessage && !showUploadForm"
            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
         <span class="block sm:inline">{{ errorMessage }}</span>
       </div>
-
+ 
       <ng-container *ngIf="!showUploadForm && !showMyUploads">
         <h3 class="text-2xl font-bold text-gray-800 mb-6">Your Profile Details</h3>
-
+ 
         <p class="text-gray-600 text-center mb-6">
           <span *ngIf="editMode">Edit the fields below and click 'Save Changes'.</span>
           <span *ngIf="!editMode">View your current profile information.</span>
         </p>
-
+ 
         <div *ngIf="userDetails as user; else loading" class="text-left space-y-4 flex-grow">
-
+ 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div>
               <p class="text-lg text-gray-700">
@@ -62,23 +67,22 @@
                 <span class="bg-gray-50 p-2 rounded-md block">{{ user.employeeId }}</span>
               </p>
             </div>
-
+ 
             <div>
               <p class="text-lg text-gray-700">
                 <strong class="text-indigo-600 block text-sm font-medium mb-1">Email:</strong>
                 <span class="bg-gray-50 p-2 rounded-md block">{{ user.email }}</span>
               </p>
             </div>
-
+ 
             <div>
               <p class="text-lg text-gray-700">
                 <strong class="text-indigo-600 block text-sm font-medium mb-1">First Name:</strong>
                 <span *ngIf="!editMode" class="bg-gray-50 p-2 rounded-md block">{{ user.firstName }}</span>
                 <input *ngIf="editMode && editableUserDetails" [(ngModel)]="editableUserDetails.firstName"
                        class="border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200">
-              </p>
             </div>
-
+ 
             <div>
               <p class="text-lg text-gray-700">
                 <strong class="text-indigo-600 block text-sm font-medium mb-1">Last Name:</strong>
@@ -87,7 +91,7 @@
                        class="border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200">
               </p>
             </div>
-
+ 
             <div>
               <p class="text-lg text-gray-700">
                 <strong class="text-indigo-600 block text-sm font-medium mb-1">Contact:</strong>
@@ -96,7 +100,7 @@
                        class="border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200">
               </p>
             </div>
-
+ 
             <div>
               <p class="text-lg text-gray-700">
                 <strong class="text-indigo-600 block text-sm font-medium mb-1">Department:</strong>
@@ -105,7 +109,7 @@
                        class="border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200">
               </p>
             </div>
-
+ 
             <div class="md:col-span-2">
               <p class="text-lg text-gray-700">
                 <strong class="text-indigo-600 block text-sm font-medium mb-1">Job Title:</strong>
@@ -115,7 +119,7 @@
               </p>
             </div>
           </div>
-
+ 
           <div *ngIf="editMode" class="flex justify-center space-x-4 mt-6">
             <button (click)="saveChanges()"
                     class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75">
@@ -126,59 +130,81 @@
               Cancel
             </button>
           </div>
-
+ 
         </div>
-
+ 
         <ng-template #loading>
           <div class="py-10">
             <p *ngIf="!errorMessage" class="text-gray-600 text-lg animate-pulse">Loading user details...</p>
-            </div>
+          </div>
         </ng-template>
       </ng-container>
-
+ 
       <div *ngIf="showUploadForm" class="upload-form-section flex-grow">
         <h3 class="text-2xl font-bold text-gray-800 mb-6">Upload Your Work / Achievement</h3>
         <p class="text-gray-600 text-center mb-6">Fill in the details below to upload your project or achievement.</p>
-
+ 
+        <!-- General error message for upload section -->
+        <div *ngIf="errorMessage && showUploadForm"
+             class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <span class="block sm:inline">{{ errorMessage }}</span>
+        </div>
+        <div *ngIf="successMessage && showUploadForm"
+             class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <span class="block sm:inline">{{ successMessage }}</span>
+        </div>
+ 
         <form (ngSubmit)="submitUpload()" class="space-y-4 text-left">
           <div>
             <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
             <input type="text" id="title" name="title" [(ngModel)]="uploadForm.title" required
                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <!-- Validation error for 'title' -->
+            <div *ngIf="validationErrors['title']" class="text-red-500 text-xs mt-1">{{ validationErrors['title'] }}</div>
           </div>
-
+ 
           <div>
             <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea id="description" name="description" [(ngModel)]="uploadForm.description" rows="3" required
                       class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+            <!-- Validation error for 'description' -->
+            <div *ngIf="validationErrors['description']" class="text-red-500 text-xs mt-1">{{ validationErrors['description'] }}</div>
           </div>
-
+ 
           <div>
             <label for="projectDuration" class="block text-sm font-medium text-gray-700 mb-1">Project Duration (e.g., "3 weeks", "2 months")</label>
             <input type="text" id="projectDuration" name="projectDuration" [(ngModel)]="uploadForm.projectDuration" required
                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <!-- Validation error for 'projectDuration' -->
+            <div *ngIf="validationErrors['projectDuration']" class="text-red-500 text-xs mt-1">{{ validationErrors['projectDuration'] }}</div>
           </div>
-
+ 
           <div>
             <label for="fileUrl" class="block text-sm font-medium text-gray-700 mb-1">File/Resource URL (e.g., Google Drive link, GitHub repo, demo site)</label>
             <input type="url" id="fileUrl" name="fileUrl" [(ngModel)]="uploadForm.fileUrl" required
                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <!-- Validation error for 'fileUrl' -->
+            <div *ngIf="validationErrors['fileUrl']" class="text-red-500 text-xs mt-1">{{ validationErrors['fileUrl'] }}</div>
           </div>
-
+ 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label for="startedDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
               <input type="date" id="startedDate" name="startedDate" [(ngModel)]="uploadForm.startedDate" required
                      class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+              <!-- Validation error for 'startedDate' -->
+              <div *ngIf="validationErrors['startedDate']" class="text-red-500 text-xs mt-1">{{ validationErrors['startedDate'] }}</div>
             </div>
-
+ 
             <div>
               <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
               <input type="date" id="endDate" name="endDate" [(ngModel)]="uploadForm.endDate" required
                      class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+              <!-- Validation error for 'endDate' -->
+              <div *ngIf="validationErrors['endDate']" class="text-red-500 text-xs mt-1">{{ validationErrors['endDate'] }}</div>
             </div>
           </div>
-
+ 
           <div class="flex justify-center space-x-4 mt-6">
             <button type="submit"
                     class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
@@ -191,12 +217,12 @@
           </div>
         </form>
       </div>
-
+ 
       <div *ngIf="showMyUploads" class="my-uploads-section flex-grow">
         <h3 class="text-2xl font-bold text-gray-800 mb-6">My Uploaded Works</h3>
         <p class="text-gray-600 text-center mb-6" *ngIf="myUploads.length > 0">Here are all your uploaded projects and achievements.</p>
         <p class="text-gray-600 text-center mb-6" *ngIf="myUploads.length === 0 && !errorMessage">You haven't uploaded any works yet.</p>
-
+ 
         <div *ngIf="myUploads.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[400px] overflow-y-auto pr-2">
           <div *ngFor="let upload of myUploads"
                class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-200 relative">
@@ -207,7 +233,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
               </svg>
             </button>
-
+ 
             <h4 class="text-xl font-bold text-indigo-700 mb-2">{{ upload.title }}</h4>
             <p class="text-gray-700 mb-2">{{ upload.description }}</p>
             <p class="text-sm text-gray-500 mb-1">Duration: <span class="font-semibold">{{ upload.projectDuration }}</span></p>
@@ -219,15 +245,22 @@
               View Resource
               <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0l-7 7m7-7v6"></path></svg>
             </a>
+            <!-- Use the new onViewDetails method for navigation -->
+            <button (click)="onViewDetails(upload.uploadId)"
+                    class="mt-4 px-4 py-2 bg-indigo-500 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-600 transition-colors duration-200">
+              View Details (Exhibition)
+            </button>
           </div>
         </div>
       </div>
-
+ 
       <button (click)="logout()"
               class="mt-10 w-full px-6 py-3 bg-red-600 text-white font-semibold rounded-full shadow-lg hover:bg-red-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75">
         Logout
       </button>
-
+ 
     </div>
   </div>
 </div>
+ 
+ 

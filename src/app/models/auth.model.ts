@@ -3,29 +3,9 @@ export interface SignInRequest {
   email: string;
   password: string;
 }
-    email: string;
-    password: string;
-  }
   
-  export interface SignInResponse {
-    jwtToken: string;
-    email: string;
-    roles: string[];
-    employeeId?: number;
-    // Add other fields your backend login response includes them, e.g., firstName, lastName, userAutoId
-  }
   
-  export interface SignUpRequest {
-    employeeId: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    contactInformation: string;
-    department: string;
-    jobTitle: string;
-    personalEmail: string;
-  }
+ 
 
 
 export interface SignInResponse {

@@ -11,7 +11,18 @@ export interface JobPostRequest {
     skillsRequired: string;
     // managerId is handled by backend, so not included here for posting
   }
-  
+  export interface JobPostErrors {
+    title?: string;
+    description?: string;
+    location?: string;
+    salary?: string;
+    jobType?: string;
+    experienceLevel?: string;
+    skillsRequired?: string;
+    managerId?: string; // Add any other fields that might return errors
+    // ... any other fields that might have validation errors
+    [key: string]: string | undefined; // For dynamic access if needed
+  }
   // Interface for what you RECEIVE when fetching a job or after posting.
   // The backend adds 'id', 'postedDate', and 'managerId' to the response.
   export interface Job {

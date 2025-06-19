@@ -52,7 +52,33 @@
       </div>
       <div class="form-group">
         <label for="jobTitle">Job Title:</label>
-        <input type="text" id="jobTitle" name="jobTitle" [(ngModel)]="signUpData.jobTitle" required>
+        <select id="jobTitle" name="jobTitle" [(ngModel)]="signUpData.jobTitle" required
+                class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+          <option value="" disabled selected>Select your job title</option> <optgroup label="Manager Roles">
+            <option value="Software Engineering Manager">Software Engineering Manager</option>
+            <option value="Technical Lead">Technical Lead</option>
+            <option value="Project Manager">Project Manager</option>
+            <option value="Product Manager">Product Manager</option>
+            <option value="Scrum Master">Scrum Master</option>
+            <option value="Director of Engineering">Director of Engineering</option>
+            <option value="Engineering Manager">Engineering Manager</option>
+            <option value="Solutions Architect (with leadership focus)">Solutions Architect (with leadership focus)</option>
+            <option value="Release Manager">Release Manager</option>
+            <option value="IT Manager">IT Manager</option>
+          </optgroup>
+          <optgroup label="Employee Roles">
+            <option value="Software Developer (Backend)">Software Developer (Backend)</option>
+            <option value="Frontend Engineer">Frontend Engineer</option>
+            <option value="Mobile App Developer (Android)">Mobile App Developer (Android)</option>
+            <option value="Quality Assurance (QA) Engineer">Quality Assurance (QA) Engineer</option>
+            <option value="DevOps Engineer">DevOps Engineer</option>
+            <option value="Data Scientist">Data Scientist</option>
+            <option value="UX Designer">UX Designer</option>
+            <option value="Full-Stack Developer">Full-Stack Developer</option>
+            <option value="Cloud Engineer">Cloud Engineer</option>
+            <option value="Site Reliability Engineer (SRE)">Site Reliability Engineer (SRE)</option>
+          </optgroup>
+        </select>
       </div>
       <div class="form-group">
         <label for="personalEmail">Personal Email:</label>

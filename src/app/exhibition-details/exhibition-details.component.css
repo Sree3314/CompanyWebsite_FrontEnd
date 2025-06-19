@@ -179,6 +179,7 @@
 
 /* Messages (loading, error, general info) */
 .message {
+  color: #c62828;
   text-align: center;
   padding: 15px;
   border-radius: 5px;

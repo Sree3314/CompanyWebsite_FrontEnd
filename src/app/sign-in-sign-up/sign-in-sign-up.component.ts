@@ -98,7 +98,7 @@ export class SignInSignUpComponent implements OnInit {
       next: (response) => {
         this.successMessage = 'Sign in successful! Redirecting to dashboard...';
         setTimeout(() => {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/home']);
         }, 1000);
       },
       error: (error) => {

@@ -265,4 +265,34 @@ body {
     .achievement-cards-container {
       grid-template-columns: 1fr;
     }
+    /* app.component.css */
+/* Existing styles... */
+
+.logout-button {
+  background-color: transparent;
+  border: none;
+  color: #007bff; /* Or whatever your nav-link color is */
+  cursor: pointer;
+  padding: 0.5rem 1rem; /* Adjust as needed */
+  font-size: 1rem; /* Match other nav links */
+  transition: color 0.3s ease;
+}
+
+.logout-button:hover {
+  color: #0056b3; /* Darker shade on hover */
+  text-decoration: underline;
+}
+
+/* Ensure nav-links also have consistent padding/margin */
+.nav-link {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #007bff; /* Example color */
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
   }

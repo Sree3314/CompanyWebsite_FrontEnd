@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Observable, Subscription, of, BehaviorSubject, combineLatest } from 'rxjs'; // Import BehaviorSubject and combineLatest
-import { catchError, tap, map, debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators'; // Remove switchMap if not used for filtering directly
+import { Observable, Subscription, of, BehaviorSubject, combineLatest } from 'rxjs';
+import { catchError, tap, map, debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { JobService } from '../services/job.service';
 import { ApplicationService } from '../services/application.service';
@@ -10,6 +10,26 @@ import { Job, JobPostRequest } from '../models/job.model';
 import { Application, ApplicationRequestDTO, ApplicationStatus } from '../models/application.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
+// Assuming JobPostErrors is defined as shown above, perhaps in job.model.ts or here:
+interface JobPostErrors {
+  title?: string;
+  description?: string;
+  location?: string;
+  salary?: string;
+  jobType?: string;
+  experienceLevel?: string;
+  skillsRequired?: string;
+  managerId?: string;
+  // Add any other fields that might return errors from your backend
+}
+
+// NEW: Define a type for Application form errors
+interface ApplicationFormErrors {
+  resumeLink?: string;
+  skills?: string;
+  yearsOfExperience?: string;
+  // Add any other fields that might return errors from your backend for application
+}
 
 @Component({
   selector: 'app-job-portal',
@@ -23,16 +43,15 @@ export class JobPortalComponent implements OnInit, OnDestroy {
   isManager: boolean = false;
 
   // Jobs
-  private jobsSubject = new BehaviorSubject<Job[]>([]); // NEW: Source of truth for all jobs
-  jobs$: Observable<Job[]>; // Expose as Observable
-  filteredJobs$: Observable<Job[]>; // Observable for filtered jobs
-  jobSearchQuery: string = ''; // Search query for jobs
-  // private jobsList: Job[] = []; // No longer strictly needed for filtering due to BehaviorSubject, but can keep for direct access if needed.
+  private jobsSubject = new BehaviorSubject<Job[]>([]);
+  jobs$: Observable<Job[]>;
+  filteredJobs$: Observable<Job[]>;
+  jobSearchQuery: string = '';
 
   // Applications
   allApplications: Application[] = [];
-  filteredApplications: Application[] = []; // Filtered applications for manager view
-  applicationSearchQuery: string = ''; // Search query for applications
+  filteredApplications: Application[] = [];
+  applicationSearchQuery: string = '';
 
   private userRolesSubscription: Subscription | undefined;
 
@@ -48,6 +67,7 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     skillsRequired: ''
   };
   jobPostMessage: string = '';
+  jobFormErrors: JobPostErrors = {};
 
   // For Apply Now functionality (User Role)
   showApplyForm: boolean = false;
@@ -59,17 +79,20 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     yearsOfExperience: 0
   };
   applicationMessage: string = '';
+  // NEW: Property to store application form errors
+  applicationFormErrors: ApplicationFormErrors = {};
+
 
   // To track user's own applications to disable 'Apply Now' button
-  private myApplicationsSubject = new BehaviorSubject<Application[]>([]); // NEW: Source of truth for user's applications
-  myApplications$: Observable<Application[]>; // Expose as Observable
+  private myApplicationsSubject = new BehaviorSubject<Application[]>([]);
+  myApplications$: Observable<Application[]>;
   private currentUserEmployeeId: number | null = null;
 
   // For Manager to view all applications
   showViewApplications: boolean = false;
 
   // For User to view their own applications
-  showMyApplications: boolean = false; // Flag to control visibility of "My Applications"
+  showMyApplications: boolean = false;
 
   // Expose ApplicationStatus enum to the template (THIS IS CRUCIAL FOR HTML ACCESS)
   public ApplicationStatus = ApplicationStatus;
@@ -80,17 +103,15 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     private jobService: JobService,
     private applicationService: ApplicationService
   ) {
-    this.jobs$ = this.jobsSubject.asObservable(); // Initialize jobs$ from the subject
-    this.myApplications$ = this.myApplicationsSubject.asObservable(); // Initialize myApplications$ from its subject
+    this.jobs$ = this.jobsSubject.asObservable();
+    this.myApplications$ = this.myApplicationsSubject.asObservable();
 
-    // Initialize filteredJobs$ to react to changes in jobsSubject and jobSearchQuery
     this.filteredJobs$ = combineLatest([
-      this.jobsSubject.asObservable(), // Listen to changes in the raw job list
-      // Listen to changes in the search query, with debounce for performance
+      this.jobsSubject.asObservable(),
       of(this.jobSearchQuery).pipe(
-        debounceTime(300), // Wait 300ms after last keystroke
-        distinctUntilChanged(), // Only emit if the value is different
-        startWith(this.jobSearchQuery) // Emit initial value
+        debounceTime(300),
+        distinctUntilChanged(),
+        startWith(this.jobSearchQuery)
       )
     ]).pipe(
       map(([jobs, query]) => {
@@ -103,7 +124,7 @@ export class JobPortalComponent implements OnInit, OnDestroy {
             job.skillsRequired.toLowerCase().includes(lowerCaseQuery)
           );
         } else {
-          return jobs; // If no query, show all jobs
+          return jobs;
         }
       }),
       catchError((error: HttpErrorResponse) => {
@@ -126,11 +147,10 @@ export class JobPortalComponent implements OnInit, OnDestroy {
         }
       });
 
-      this.loadAllJobs(); // Initial load of all jobs for display
+      this.loadAllJobs();
       if (this.isManager) {
-        this.showJobPostForm = false; // Ensure it's false by default
-        this.showViewApplications = false; // Ensure it's false by default
-        // No initial load of all applications here, it will be loaded when toggleViewApplications is called
+        this.showJobPostForm = false;
+        this.showViewApplications = false;
       }
     });
   }
@@ -139,30 +159,26 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     if (this.userRolesSubscription) {
       this.userRolesSubscription.unsubscribe();
     }
-    this.jobsSubject.complete(); // Clean up subjects
+    this.jobsSubject.complete();
     this.myApplicationsSubject.complete();
   }
 
   loadAllJobs(): void {
     this.jobService.getAllJobs().pipe(
       tap(jobs => {
-        this.jobsSubject.next(jobs); // Push the new list of jobs to the subject
-        // this.jobsList = jobs; // This line is now redundant for filtering, but can be kept if needed for other direct array manipulations.
+        this.jobsSubject.next(jobs);
         console.log('Loaded All Jobs:', jobs);
       }),
       catchError((error: HttpErrorResponse) => {
         console.error('Error loading all jobs:', error);
-        this.jobsSubject.next([]); // Emit empty array on error
+        this.jobsSubject.next([]);
         return of([]);
       })
-    ).subscribe(); // Subscribe to trigger the API call and update subject
+    ).subscribe();
   }
 
-  // Method to filter jobs based on search query
   onJobSearch(): void {
     // The filtering logic is now handled reactively by filteredJobs$
-    // We just need to trigger a change in jobSearchQuery to make it re-evaluate
-    // This is implicitly handled by [(ngModel)] binding, but if you had a separate search button, this would be its handler.
   }
 
   /**
@@ -173,9 +189,10 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     this.showJobPostForm = !this.showJobPostForm;
     if (this.showJobPostForm) {
       this.showViewApplications = false;
-      this.showMyApplications = false; // Ensure other user-related views are hidden
+      this.showMyApplications = false;
     }
     this.jobPostMessage = '';
+    // Reset form and errors when toggling or opening the form
     this.newJob = {
       title: '',
       description: '',
@@ -185,22 +202,31 @@ export class JobPortalComponent implements OnInit, OnDestroy {
       experienceLevel: '',
       skillsRequired: ''
     };
+    this.jobFormErrors = {};
   }
-
   submitJob(): void {
+    this.jobPostMessage = '';
+    this.jobFormErrors = {};
+
     this.jobService.postJob(this.newJob).subscribe({
       next: (response) => {
         this.jobPostMessage = 'Job posted successfully!';
         console.log('Job post success!', response);
-        this.toggleJobPostForm(); // Optionally hide the form after successful post
-        this.loadAllJobs(); // Reload jobs to include the new one (will update jobsSubject)
+        this.toggleJobPostForm();
+        this.loadAllJobs();
       },
       error: (error: HttpErrorResponse) => {
-        this.jobPostMessage = 'Error posting job: ' + (error.error?.message || 'Please try again.');
         console.error('Job post error:', error);
+        if (error.status === 400 && error.error) {
+          this.jobFormErrors = error.error as JobPostErrors;
+          this.jobPostMessage = 'Please correct the errors in the form.';
+        } else {
+          this.jobPostMessage = 'Error posting job: ' + (error.error?.message || 'An unexpected error occurred. Please try again.');
+        }
       }
     });
   }
+
 
   openApplyForm(job: Job): void {
     this.selectedJobForApplication = job;
@@ -208,6 +234,7 @@ export class JobPortalComponent implements OnInit, OnDestroy {
       this.applicationFormData.jobId = job.id;
       this.showApplyForm = true;
       this.applicationMessage = '';
+      this.applicationFormErrors = {}; // NEW: Clear previous application form errors when opening
     } else {
       console.error('Job ID is missing for selected job:', job);
       this.applicationFormData = { jobId: 0, resumeLink: '', skills: '', yearsOfExperience: 0 };
@@ -219,6 +246,7 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     this.showApplyForm = false;
     this.selectedJobForApplication = null;
     this.applicationFormData = { jobId: 0, resumeLink: '', skills: '', yearsOfExperience: 0 };
+    this.applicationFormErrors = {}; // NEW: Clear errors when closing the form
   }
 
   submitApplication(): void {
@@ -227,18 +255,27 @@ export class JobPortalComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.applicationMessage = ''; // NEW: Clear general message before new submission
+    this.applicationFormErrors = {}; // NEW: Clear previous field-specific errors
+
     this.applicationService.applyForJob(this.applicationFormData).subscribe({
       next: (response) => {
         this.applicationMessage = 'Application submitted successfully!';
         console.log('Application success (response might be empty):', response);
         this.closeApplyForm();
         if (this.currentUserEmployeeId) {
-          this.loadMyApplications(this.currentUserEmployeeId); // Reload user's applications
+          this.loadMyApplications(this.currentUserEmployeeId);
         }
       },
       error: (error: HttpErrorResponse) => {
-        this.applicationMessage = 'Error submitting application: ' + (error.error?.message || 'Please try again.');
         console.error('Application error:', error);
+        if (error.status === 400 && error.error) {
+          // Assuming error.error is the object with field-specific messages from the backend
+          this.applicationFormErrors = error.error as ApplicationFormErrors; // Cast to the new error type
+          this.applicationMessage = 'Please correct the errors in your application.';
+        } else {
+          this.applicationMessage = 'Error submitting application: ' + (error.error?.message || 'Please try again.');
+        }
       }
     });
   }
@@ -246,19 +283,18 @@ export class JobPortalComponent implements OnInit, OnDestroy {
   loadMyApplications(employeeId: number): void {
     this.applicationService.getApplicationsByEmployee(employeeId).pipe(
       tap(applications => {
-        this.myApplicationsSubject.next(applications); // Push to subject
+        this.myApplicationsSubject.next(applications);
         console.log('Loaded My Applications:', applications);
       }),
       catchError(error => {
         console.error('Error loading my applications:', error);
-        this.myApplicationsSubject.next([]); // Emit empty array on error
+        this.myApplicationsSubject.next([]);
         return of([]);
       })
-    ).subscribe(); // Subscribe to trigger the API call and update subject
+    ).subscribe();
   }
 
   hasApplied(jobId: number): boolean {
-    // Access the current value of the BehaviorSubject directly for immediate check
     const applications = this.myApplicationsSubject.getValue();
     return applications.some(app =>
       app.job.id === jobId &&
@@ -274,23 +310,23 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     this.showViewApplications = !this.showViewApplications;
     if (this.showViewApplications) {
       this.showJobPostForm = false;
-      this.showMyApplications = false; // Ensure user-related views are hidden
-      this.loadAllApplications(); // Load applications when showing the view
+      this.showMyApplications = false;
+      this.loadAllApplications();
     }
   }
 
   loadAllApplications(): void {
     this.applicationService.getAllApplications().pipe(
       tap(applications => {
-        this.allApplications = applications; // Store the original list
-        this.onApplicationSearch(); // Apply initial filter (empty query means show all)
+        this.allApplications = applications;
+        this.onApplicationSearch();
         console.log('Loaded All Applications (Manager):', applications);
       }),
       catchError(error => {
         console.error('Error loading all applications:', error);
         return of([]);
       })
-    ).subscribe(); // Subscribe here to trigger the tap and error handling
+    ).subscribe();
   }
 
   // Method to filter applications based on search query
@@ -304,7 +340,7 @@ export class JobPortalComponent implements OnInit, OnDestroy {
         app.skills.toLowerCase().includes(query)
       );
     } else {
-      this.filteredApplications = this.allApplications; // If no query, show all
+      this.filteredApplications = this.allApplications;
     }
   }
 
@@ -315,8 +351,8 @@ export class JobPortalComponent implements OnInit, OnDestroy {
   showAvailableJobsForManager(): void {
     this.showJobPostForm = false;
     this.showViewApplications = false;
-    this.showMyApplications = false; // Ensure user-specific view is also hidden if manager
-    this.loadAllJobs(); // Re-load or ensure jobs are loaded (will update jobsSubject)
+    this.showMyApplications = false;
+    this.loadAllJobs();
   }
 
   // New method to toggle My Applications view for users
@@ -336,13 +372,10 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     this.applicationService.updateApplicationStatus(applicationId, status).subscribe({
       next: (response) => {
         console.log(`Application ${applicationId} status updated to ${status}`, response);
-        // After successful update, reload all applications to reflect the change
         this.loadAllApplications();
-        // Optionally, show a success message to the user
       },
       error: (error: HttpErrorResponse) => {
         console.error(`Error updating application ${applicationId} to ${status}:`, error);
-        // Optionally, show an error message to the user
         alert('Failed to update application status. Please try again.');
       }
     });
@@ -354,15 +387,7 @@ export class JobPortalComponent implements OnInit, OnDestroy {
       this.jobService.deleteJob(jobId).subscribe({
         next: () => {
           alert('Job deleted successfully!');
-          // Option 1: Re-fetch all jobs (current approach, should work with BehaviorSubject)
           this.loadAllJobs();
-
-          // Option 2 (More efficient for single deletions): Directly update the subject
-          // This avoids an extra API call if you only need to remove one item.
-          // const currentJobs = this.jobsSubject.getValue();
-          // const updatedJobs = currentJobs.filter(job => job.id !== jobId);
-          // this.jobsSubject.next(updatedJobs); // Push the updated array
-
         },
         error: (error: HttpErrorResponse) => {
           console.error('Error deleting job:', error);
@@ -373,7 +398,7 @@ export class JobPortalComponent implements OnInit, OnDestroy {
           } else {
             alert('Failed to delete job: ' + (error.error?.message || 'Server error.'));
           }
-          this.loadAllJobs(); // Attempt to reload jobs even on error to sync state
+          this.loadAllJobs();
         }
       });
     }
