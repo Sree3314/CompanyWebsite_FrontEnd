@@ -1,33 +1,520 @@
 /* src/app/faq/faq.component.css */
 
-/* Component specific styles, mostly for overrides or unique elements */
-/* Tailwind CSS classes are heavily used directly in the HTML template. */
+/* Import Google Font - Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Define Color Variables */
+:root {
+    --primary-dark-blue: #000048; /* Royal Blue */
+    --white: #ffffff;
+    --light-blue: #E0F2F7; /* Subtle light blue for user messages, matches a cool, light tone */
+    --neutral-grey-bg: #f8f9fa; /* Very light grey for general backgrounds */
+    --neutral-grey-light: #e9ecef; /* Lighter grey for borders/other messages */
+    --neutral-grey-medium: #ced4da; /* Medium grey for input borders */
+    --neutral-grey-dark: #6c757d; /* Dark grey for general text */
+    --text-color-heading: #343a40; /* Darker text for headings */
+    --text-color-body: #495057; /* Standard body text */
+    --success-green: #28a745;
+    --error-red: #dc3545;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--neutral-grey-bg); /* Overall body background */
+    margin: 0; /* Remove default body margin */
+    padding: 0; /* Remove default body padding */
+    height: 100vh; /* Ensure body takes full viewport height */
+    display: flex; /* Use flex to center/expand main container */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically if faq-container doesn't fill height */
+}
 
 .faq-container {
-    background-color: #f7f9fc; /* Light blue-gray for the container */
+    background-color: var(--white);
+    border-radius: 8px; /* Slightly less rounded for sleekness */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* A clean, subtle shadow */
+    width: 96%; /* Occupy almost whole screen width */
+    height: 96vh; /* Occupy almost whole screen height */
+    margin: 2vh 2%; /* Very little padding around it (2% on each side, 2vh top/bottom) */
+    padding: 2.5rem; /* Internal padding remains generous */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Allow the main container to scroll vertically if content exceeds its height */
+    position: relative; /* Needed for positioning the add-question-button */
+}
+
+/* New: Plus button styling */
+.add-question-button {
+    position: absolute;
+    top: 1.5rem; /* Adjust as needed for alignment with h2 */
+    right: 2.5rem; /* Match faq-container padding */
+    background-color: var(--primary-dark-blue);
+    color: var(--white);
+    font-size: 2rem; /* Larger plus sign */
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 72, 0.2);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 20; /* Ensure it's above other content */
+}
+.add-question-button:hover {
+    background-color: #000030;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 72, 0.3);
+}
+
+h2 {
+    color: var(--primary-dark-blue); /* Royal Blue for main heading */
+    font-weight: 700;
+    margin-bottom: 2rem;
+    letter-spacing: -0.02em;
+    margin-right: 4rem; /* Make space for the button */
+}
+
+h3 {
+    color: var(--text-color-heading);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* Alert Messages */
+.alert-message {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    font-size: 0.9rem;
+}
+.error-message {
+    background-color: #ffebe9;
+    border-color: var(--error-red);
+    color: var(--error-red);
+}
+.success-message {
+    background-color: #e9ffee;
+    border-color: var(--success-green);
+    color: var(--success-green);
+}
+
+/* Removed .message-input-area styling as it's now a conditional card */
+/* .message-input-area { ... } */
+
+.input-field, .input-field-sm {
+    border: 1px solid #000048; /* Medium grey border */
+    border-radius: 25px; /* Slightly less rounded than message bubbles */
+    box-shadow: #495057;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    font-size: 0.95rem;
+    color: var(--text-color-body);
+    /**transition: border-color 0.2s ease; /* Only border color transition */
+    background-color: var(--white);
+}
+.input-field:focus, .input-field-sm:focus {
+    outline: none;
+    border-color: var(--primary-dark-blue); /* Royal blue on focus */
+    box-shadow: 0 0 0 2px rgba(0, 0, 72, 0.1); /* Subtle, non-glowing focus ring */
+}
+.input-field-sm {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+}
+
+.send-button {
+    background-color: var(--primary-dark-blue); /* Royal Blue for send button */
+    color: var(--white);
+    font-weight: 600;
+    padding: 0.8rem 1.8rem;
+    border-radius: 28px;
+    font-size: 1rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 72, 0.15); /* Matte shadow */
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+.send-button:hover {
+    background-color: #000030; /* Slightly darker royal blue on hover */
+    transform: translateY(-1px); /* Subtle lift */
+    box-shadow: 0 4px 12px rgba(0, 0, 72, 0.2); /* Slightly more pronounced matte shadow */
+}
+
+/* Chat Container (Main message display area) */
+.chat-container {
+    background-color: var(--white);
+    border: 1px solid var(--neutral-grey-light);
+    border-radius: 8px; /* Consistent with faq-container */
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+    overflow-y: auto; /* Enables vertical scrolling for the chat history specifically */
+    flex-grow: 1; /* Allows it to take up remaining vertical space */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Space between message threads */
+    margin-bottom: 0; /* Ensure no extra margin pushes it from the bottom */
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--neutral-grey-dark);
+    padding: 2rem 0;
+    font-style: italic;
+}
+
+/* Individual Message Thread (Question + its answers) */
+.chat-message-thread {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Wrapper for a single message (either question or answer) */
+.chat-item-wrapper {
+    display: flex;
+    width: 100%;
+    align-items: flex-start;
+    position: relative; /* For positioning absolute actions */
+}
+
+/* Common message box styling */
+.chat-message {
+    padding: 0.9rem 1.3rem;
+    border-radius: 8px; /* Sleeker rounded corners */
+    max-width: 70%;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Very subtle, matte shadow */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition for hover */
+    margin-bottom: 0.5rem;
+    border: 1px solid transparent; /* Base border for consistency */
+}
+
+/* Hover effect for messages - matte finish */
+.chat-message:hover {
+    transform: translateY(-2px); /* Subtle lift */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* More noticeable but still matte shadow */
+    /* border-color: rgba(0, 0, 72, 0.1); Optional: add a very light border on hover */
+}
+
+/* Current user messages (aligned right) */
+.chat-item-wrapper.current-user-item {
+    justify-content: flex-end;
+}
+.chat-item-wrapper.current-user-item .chat-message {
+    background-color: #000048; /* Light blue for current user */
+    color: white;
+    border-color: #d0e8f0; /* Subtle light blue border */
+}
+
+/* Other user messages (aligned left) */
+.chat-item-wrapper:not(.current-user-item) .chat-message {
+    background-color:rgb(136, 136, 136); /* Lighter grey for others */
+    color: black;
+    border-color: #e2e6eb; /* Subtle lighter grey border */
+}
+
+/* Chat Header (User info within message) */
+.chat-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--neutral-grey-dark);
+}
+.profile-pic {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    margin-right: 0.7rem;
+    border: 1px solid var(--neutral-grey-medium); /* Consistent grey border for profile pic */
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.profile-pic-sm {
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    margin-right: 0.6rem;
+    border: 1px solid var(--neutral-grey-medium);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.chat-header .info {
+    display: flex;
+    flex-direction: column;
+}
+.chat-header .name-role {
+    font-weight: 600;
+    color: var(--primary-dark-blue); /* Names in royal blue */
+}
+.job-title-tag, .role-tag {
+    display: inline-block;
+    background-color: rgba(0, 0, 72, 0.08); /* Dark blue with subtle opacity */
+    color: var(--primary-dark-blue);
+    padding: 0.15rem 0.5rem;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    max-width: 900px; /* Constrain width for readability */
-    margin: 40px auto; /* Center the container */
-    padding-bottom: 20px; /* Add some padding at the bottom */
+    font-size: 0.7rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+.timestamp {
+    font-size: 0.7rem;
+    color: var(--neutral-grey-dark);
+    margin-top: 2px;
 }
 
-h2, h3 {
-    font-family: 'Inter', sans-serif; /* Use Inter for consistency with general app theme */
+.chat-message h4 { /* Question Title */
+    margin-top: 0.2rem;
+    margin-bottom: 0.6rem;
+    color: var(--text-color-heading);
+    font-weight: 600;
 }
 
-/* Question Card Styles */
-.question-card {
-    border-left: 5px solid #3b82f6; /* Blue border for emphasis */
+.message-content {
+    color: var(--text-color-body);
 }
 
-/* Answer Card Styles */
-.answer-card {
-    border: 1px solid #e0e7ff; /* Lighter blue border for answers */
+/* Message Actions (Edit/Delete) - HIDDEN BY DEFAULT, SHOWN ON HOVER */
+.message-actions {
+    position: absolute;
+    top: 5px;
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background for matte effect */
+    padding: 4px 8px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); /* Matte shadow */
+    border: 1px solid rgba(0,0,0,0.03); /* Very light border */
 }
+
+/* Position actions for left-aligned messages */
+.chat-item-wrapper:not(.current-user-item) .message-actions {
+    right: 5px;
+}
+
+/* Position actions for right-aligned messages */
+.chat-item-wrapper.current-user-item .message-actions {
+    left: 5px;
+}
+
+/* Show actions on message hover OR if an edit form is active */
+.chat-message:hover .message-actions,
+.message-actions.active-actions {
+    opacity: 1;
+    pointer-events: auto;
+    color:black;
+}
+
+.reply-count {
+    font-size: 0.75rem;
+    color: var(--neutral-grey-dark);
+    margin-right: 0.5rem;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    color: var(--neutral-grey-dark);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+.action-button:hover {
+    color: var(--primary-dark-blue); /* Royal blue on hover */
+    text-decoration: underline;
+}
+.action-button.delete-button:hover {
+    color: var(--error-red);
+}
+
+/* Smaller actions for replies */
+.message-actions.small-actions {
+    top: 3px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    gap: 6px;
+}
+.small-actions .action-button {
+    font-size: 0.7rem;
+}
+
+
+/* Answers List (Replies) */
+.answers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    padding-left: 3.5rem;
+    margin-top: 0.8rem;
+    position: relative;
+}
+.answers-list::before {
+    content: '';
+    position: absolute;
+    left: 1.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--neutral-grey-light); /* Subtle line in light grey */
+    border-radius: 2px;
+}
+
+/* Specific styling for reply messages */
+.chat-message.reply-message {
+    background-color:grey; /* Replies are white */
+    border: 1px solid var(--neutral-grey-light);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03); /* Even more subtle matte shadow */
+    max-width: 85%;
+    font-size: 0.85rem;
+}
+
+
+.chat-item-wrapper.current-user-item .chat-message.reply-message {
+    background-color:rgb(214, 233, 247); /* Very light, cool blue for current user replies */
+    border-color:black;
+    color:black;
+}
+
+
+/* Edit Forms */
+.edit-form-sm { /* Renamed from .edit-form as it's only for answers now */
+    background-color: #fcfcfc;
+    border: 1px solid var(--neutral-grey-light);
+    border-radius: 6px;
+    padding: 0.8rem;
+    margin-top: 0.8rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.03); /* Matte inner shadow */
+}
+
+/* New: Conditional Card Styling for Post/Edit Question */
+.new-question-card, .edit-question-card {
+    position: fixed; /* Fixed position relative to viewport */
+    bottom: 2rem; /* Place at the bottom */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust for centering */
+    width: 90%; /* Occupy most of the width */
+    max-width: 700px; /* Max width for readability */
+    background-color: var(--white);
+    border: 1px solid var(--neutral-grey-light);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); /* More prominent shadow for a "card" effect */
+    z-index: 100; /* Ensure it's on top of everything */
+    transition: all 0.3s ease-in-out; /* Smooth transition for appearance/disappearance */
+}
+
+.save-button, .cancel-button, .save-button-sm, .cancel-button-sm {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08); /* Matte button shadow */
+}
+.save-button, .save-button-sm {
+    background-color: var(--success-green);
+    color: var(--white);
+}
+.save-button:hover, .save-button-sm:hover {
+    background-color:#000048;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1); /* Slightly more prominent matte shadow on hover */
+}
+.cancel-button, .cancel-button-sm {
+    background-color: var(--neutral-grey-dark); /* Muted grey for cancel */
+    color: var(--white);
+}
+.cancel-button:hover, .cancel-button-sm:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+.save-button-sm, .cancel-button-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+}
+
+
+/* Add Answer Form */
+.add-answer-form {
+    margin-top: 1rem;
+    padding-top: 1rem;
+}
+
+.reply-button {
+    background-color: var(--primary-dark-blue); /* Use royal blue for reply button too */
+    color: var(--white);
+    font-weight: 600;
+    padding: 0.7rem 1.4rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    box-shadow: 0 3px 8px rgba(0, 0, 72, 0.15); /* Matte shadow */
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+.reply-button:hover {
+    background-color: #000030; /* Darker royal blue on hover */
+    color: whitesmoke;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(0, 0, 72, 0.2); /* Slightly more prominent matte shadow */
+}
+
 
 /* User Profile Image Fallback (if no actual image is provided) */
-img[src="https://placehold.co/50x50/cccccc/000000?text=User"],
-img[src="https://placehold.co/40x40/cccccc/000000?text=User"] {
-  border: 1px solid #ddd;
+img[src*="placehold.co"] {
+  border: 1px solid var(--neutral-grey-medium);
+}
+/* --- NEW MODAL STYLES --- */
+.modal-overlay {
+    position: fixed; /* Stays in place even when scrolling */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Dark semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top of other content */
+    backdrop-filter: blur(3px); /* Optional: Adds a slight blur to the background */
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 2.5rem; /* Increased padding */
+    border-radius: 12px; /* More rounded corners */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+    width: 90%;
+    max-width: 550px; /* Constrain width for better readability */
+    position: relative; /* Needed for z-index if other elements overlap */
+    transform: translateY(-20px); /* Slightly move up for a "pop-up" effect */
+    animation: fadeIn 0.3s ease-out forwards; /* Simple animation */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-20px);
+    }
 }

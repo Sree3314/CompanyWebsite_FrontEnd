@@ -1,7 +1,7 @@
 // src/app/app.routes.ts
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component'; // Make sure to import HomeComponent
-import { FAQComponent } from './faq/faq.component';
+import { FaqComponent } from './faq/faq.component';
 import { JobPortalComponent } from './job-portal/job-portal.component';
 import { ExhibitionComponent } from './exhibition/exhibition.component';
 import { SignInSignUpComponent } from './sign-in-sign-up/sign-in-sign-up.component';
@@ -11,7 +11,7 @@ export const routes: Routes = [
   // This is the missing route that fixes the loop!
   { path: 'home', component: HomeComponent },
 
-  { path: 'faq', component: FAQComponent },
+  { path: 'faq', component: FaqComponent },
   { path: 'job-portal', component: JobPortalComponent },
   { path: 'exhibition', component: ExhibitionComponent },
   {path:'signin_signup', component:SignInSignUpComponent},

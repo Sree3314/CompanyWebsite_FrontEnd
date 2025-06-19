@@ -3,6 +3,10 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, tap, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
+
+ 
+import { SignInRequest, SignInResponse, SignUpRequest ,MessageResponse,ResetPasswordRequest} from '../models/auth.model';
+
 import { jwtDecode } from 'jwt-decode';
 
 // IMPORTANT: Import your models from the correct path
@@ -18,14 +22,22 @@ export class AuthService {
   private readonly USER_EMAIL_KEY = 'userEmail';
   private readonly USER_ROLES_KEY = 'userRoles';
 
+ 
+  private apiUrl = 'http://localhost:8089/api/auth'; // Base URL for your auth API
+ 
+  private _isLoggedIn$: BehaviorSubject<boolean>;
+  isLoggedIn$: Observable<boolean>;
+ 
+
   private apiUrl = 'http://localhost:8089/api/auth'; // Base URL for your auth API
 
   private _isLoggedIn$: BehaviorSubject<boolean>;
   isLoggedIn$: Observable<boolean>;
 
+
   private _currentUserAutoId: number | null = null;
   private _currentUserRoles: string[] = [];
-
+ 
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -36,6 +48,11 @@ export class AuthService {
 
     this.loadUserFromLocalStorage();
   }
+ 
+
+
+    this.loadUserFromLocalStorage();
+  }
 
   private hasTokenInLocalStorage(): boolean {
     if (isPlatformBrowser(this.platformId)) {
@@ -43,7 +60,7 @@ export class AuthService {
     }
     return false;
   }
-
+ 
   /**
    * Attempts to load user details (including employeeId) from localStorage on service initialization.
    * Updates internal state and notifies subscribers.
@@ -53,7 +70,7 @@ export class AuthService {
       this._isLoggedIn$.next(false);
       return;
     }
-
+ 
     const storedToken = localStorage.getItem(this.TOKEN_KEY);
     const storedEmail = localStorage.getItem(this.USER_EMAIL_KEY);
     const storedRoles = localStorage.getItem(this.USER_ROLES_KEY);
@@ -68,7 +85,7 @@ export class AuthService {
       this.logout(false);
     }
   }
-
+ 
   /**
    * Handles user sign-in. Stores JWT and user info in localStorage upon success.
    * Now correctly stores the employeeId from the backend response.
@@ -92,9 +109,17 @@ export class AuthService {
             }
           }
 
+ 
           // NEW: Use the actual employeeId from the response
           this._currentUserAutoId = response.employeeId || null; // Use employeeId from response, default to null
           this._currentUserRoles = response.roles;
+ 
+
+
+          // NEW: Use the actual employeeId from the response
+          this._currentUserAutoId = response.employeeId || null; // Use employeeId from response, default to null
+          this._currentUserRoles = response.roles;
+
 
           this._isLoggedIn$.next(true);
           console.log('SignIn successful. Token and user details stored. Employee ID:', this._currentUserAutoId);
@@ -105,7 +130,7 @@ export class AuthService {
       })
     );
   }
-
+ 
   /**
    * Handles user sign-up.
    * @param signUpData The sign-up details.
@@ -114,7 +139,7 @@ export class AuthService {
   signUp(signUpData: SignUpRequest): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, signUpData);
   }
-
+ 
   /**
    * Retrieves the JWT token from localStorage.
    * @returns The JWT token string or null if not found/not in browser.
@@ -125,7 +150,7 @@ export class AuthService {
     }
     return null;
   }
-
+ 
   /**
    * Checks if the user is currently logged in (has a JWT token).
    * This uses getToken(), which already handles platform checks.
@@ -134,7 +159,7 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
-
+ 
   /**
    * Logs out the user by removing token and user details from localStorage.
    * Also clears the internal user state and notifies subscribers.
@@ -155,7 +180,7 @@ export class AuthService {
       this.router.navigate(['/signin_signup']);
     }
   }
-
+ 
   /**
    * Returns the current authenticated user's autoId (employeeId).
    * @returns Observable emitting the user's autoId or null if not logged in.
@@ -163,7 +188,7 @@ export class AuthService {
   getCurrentUserAutoId(): Observable<number | null> {
     return of(this._currentUserAutoId);
   }
-
+ 
   /**
    * Returns the current authenticated user's roles.
    * @returns Observable emitting an array of user roles.
@@ -180,6 +205,7 @@ export class AuthService {
   forgotPassword(personalEmail: string): Observable<MessageResponse> {
     return this.http.post<MessageResponse>(`${this.apiUrl}/forgot-password`, { personalEmail: personalEmail });
   }
+
 
   getUserRoles(): string[] {
     if (isPlatformBrowser(this.platformId)) {
@@ -239,6 +265,7 @@ export class AuthService {
       return null;
     }
   }
+
   /**
    * Sends a request to reset the password using OTP.
    * @param resetRequest DTO containing organization email, OTP (token), and new password.
