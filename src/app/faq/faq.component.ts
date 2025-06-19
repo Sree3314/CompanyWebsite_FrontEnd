@@ -1,340 +1,370 @@
 // src/app/faq/faq.component.ts
 
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FaqService } from '../services/faq.service';
-import { Question, Answer, QuestionRequest, AnswerRequest } from '../models/faq.model';
-import { catchError, of, tap } from 'rxjs';
-
-// Assume a basic User service/model exists to get current user info (for authorization checks)
 import { AuthService } from '../services/auth.service';
+import { Observable, forkJoin } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { Question, Answer, QuestionRequest, AnswerRequest } from '../models/faq.model';
 
 @Component({
   selector: 'app-faq',
-  standalone: true, // IMPORTANT: Set to true for its own imports array to work
-  imports: [
-    CommonModule,  // Provides *ngIf, *ngFor
-    FormsModule    // Provides [(ngModel)]
-  ],
-  providers: [DatePipe], // Provide DatePipe here if not globally
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './faq.component.html',
-  styleUrls: ['./faq.component.css']
+  styleUrl: './faq.component.css'
 })
-export class FAQComponent implements OnInit {
+export class FaqComponent implements OnInit {
   questions: Question[] = [];
+
+  // General messages (will auto-disappear except for specific "cannot be empty" server errors)
+  _errorMessage: string | null = null;
+  _successMessage: string | null = null;
+
+  // Specific message for validation errors within the cards
+  cardErrorMessage: string | null = null;
+
+  // Timers for general messages
+  private errorTimeout: any;
+  private successTimeout: any;
+
+  // Public getters/setters for general messages to trigger setTimeout
+  get errorMessage(): string | null {
+    return this._errorMessage;
+  }
+
+  set errorMessage(message: string | null) {
+    this._errorMessage = message;
+    if (this.errorTimeout) {
+      clearTimeout(this.errorTimeout);
+    }
+    // Only set timeout if the message is NOT an empty content validation (those are handled by cardErrorMessage)
+    // AND if it's not null.
+    if (message && !message.includes('cannot be empty')) {
+      this.errorTimeout = setTimeout(() => {
+        this._errorMessage = null;
+      }, 10000); // 10 seconds
+    }
+  }
+
+  get successMessage(): string | null {
+    return this._successMessage;
+  }
+
+  set successMessage(message: string | null) {
+    this._successMessage = message;
+    if (this.successTimeout) {
+      clearTimeout(this.successTimeout);
+    }
+    if (message) {
+      this.successTimeout = setTimeout(() => {
+        this._successMessage = null;
+      }, 10000); // 10 seconds
+    }
+  }
+
+  // New properties for new question card
+  showPostQuestionCard: boolean = false;
   newQuestionTitle: string = '';
   newQuestionContent: string = '';
-  answerContent: { [questionId: number]: string } = {}; // Store answer content per question
-  editingQuestionId: number | null = null;
-  editingQuestionTitle: string = '';
-  editingQuestionContent: string = '';
+
+  // New properties for edit question card
+  showEditQuestionCard: boolean = false;
+  editingQuestion: Question | null = null; // Holds the question being edited
+
+  // Existing properties for answer editing (remain unchanged functionality)
+  answerContent: { [key: number]: string } = {};
   editingAnswerId: number | null = null;
   editingAnswerContent: string = '';
-  // Assuming the user ID and roles are available from an authentication service
-  currentUserId: number | null = null; // This should be `userAutoId` from backend
-  currentUserRoles: string[] = []; // e.g., ['USER', 'MANAGER', 'ADMIN']
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
+
+  currentUserId: number | null = null;
+  currentUserRoles: string[] = [];
 
   constructor(
     private faqService: FaqService,
-    private authService: AuthService, // Inject AuthService
-    private datePipe: DatePipe // Inject DatePipe
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
-    // Get current user ID and roles after authentication is ready
-    this.authService.getCurrentUserAutoId().subscribe((id: number | null) => {
-      this.currentUserId = id;
+    forkJoin({
+      userId: this.authService.getCurrentUserAutoId(),
+      userRoles: this.authService.getCurrentUserRoles()
+    }).subscribe({
+      next: ({ userId, userRoles }) => {
+        this.currentUserId = userId;
+        this.currentUserRoles = userRoles;
+        this.loadQuestions();
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load user data: ' + (err.error?.message || err.message);
+        console.error('FaqComponent: Error loading user:', err);
+      }
     });
-    this.authService.getCurrentUserRoles().subscribe((roles: string[]) => {
-      this.currentUserRoles = roles;
-    });
-
-    this.loadQuestions();
   }
 
-  /**
-   * Loads all questions and their answers from the backend.
-   */
   loadQuestions(): void {
-    this.faqService.getAllQuestions().pipe(
-      tap(data => {
+    this.faqService.getAllQuestions().subscribe({
+      next: (data) => {
         this.questions = data;
-        this.questions.forEach(q => {
-          // Initialize answer content for each question
-          this.answerContent[q.id] = '';
-        });
-        this.clearMessages();
-      }),
-      catchError(error => {
-        console.error('Error loading questions:', error);
-        this.showError('Failed to load questions. Please try again.');
-        return of([]); // Return an empty array to keep the observable stream alive
-      })
-    ).subscribe();
+        this.successMessage = null;
+        this.errorMessage = null; // Clear general messages on successful load
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load questions: ' + (err.error?.message || err.message);
+        this.successMessage = null;
+        console.error('FaqComponent: Error loading questions:', err);
+      }
+    });
   }
 
-  /**
-   * Posts a new question to the backend.
-   */
+  // --- New Question Card Logic ---
+  togglePostQuestionCard(): void {
+    this.showPostQuestionCard = !this.showPostQuestionCard;
+    if (this.showPostQuestionCard) {
+      this.showEditQuestionCard = false; // Close edit card if opening post card
+      this.editingQuestion = null;
+    }
+    // Always clear fields and messages when toggling
+    this.newQuestionTitle = '';
+    this.newQuestionContent = '';
+    this.cardErrorMessage = null; // Clear card-specific error
+    this.errorMessage = null; // Clear general messages
+    this.successMessage = null;
+  }
+
   postQuestion(): void {
-    if (!this.newQuestionTitle.trim() || !this.newQuestionContent.trim()) {
-      this.showError('Question title and content cannot be empty.');
+    // Make question title mandatory
+    if (!this.newQuestionTitle.trim()) {
+      this.cardErrorMessage = 'Question title cannot be empty.';
+      return;
+    }
+    if (!this.newQuestionContent.trim()) {
+      this.cardErrorMessage = 'Question content cannot be empty.';
       return;
     }
 
     const questionRequest: QuestionRequest = {
-      title: this.newQuestionTitle,
-      content: this.newQuestionContent
+      title: this.newQuestionTitle.trim(),
+      content: this.newQuestionContent.trim()
     };
 
-    this.faqService.postQuestion(questionRequest).pipe(
-      tap(newQuestion => {
-        this.questions.unshift(newQuestion); // Add to the beginning of the list
+    this.faqService.postQuestion(questionRequest).subscribe({
+      next: (newQuestion) => {
+        this.questions.unshift(newQuestion);
         this.newQuestionTitle = '';
         this.newQuestionContent = '';
-        this.answerContent[newQuestion.id] = ''; // Initialize answer content for the new question
-        this.showSuccess('Question posted successfully!');
-      }),
-      catchError(error => {
-        console.error('Error posting question:', error);
-        this.showError('Failed to post question. Please ensure you are logged in and try again.');
-        return of(null);
-      })
-    ).subscribe();
+        this.successMessage = 'Question posted successfully!';
+        this.cardErrorMessage = null; // Clear card-specific error on success
+        this.errorMessage = null;
+        this.showPostQuestionCard = false;
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to post question: ' + (err.error?.message || err.message);
+        this.successMessage = null;
+        this.cardErrorMessage = null; // Clear card error if a server error occurs
+        console.error('FaqComponent: Error posting question:', err);
+      }
+    });
   }
 
-  /**
-   * Initiates the editing process for a question.
-   * @param question The question to edit.
-   */
-  editQuestion(question: Question): void {
-    this.editingQuestionId = question.id;
-    this.editingQuestionTitle = question.title;
-    this.editingQuestionContent = question.content;
-    this.clearMessages();
+  // --- Question Edit Card Logic ---
+  openEditQuestionCard(question: Question): void {
+    this.showPostQuestionCard = false; // Close post card if opening edit card
+    this.editingQuestion = { ...question };
+    this.showEditQuestionCard = true;
+    this.cardErrorMessage = null; // Clear card-specific error
+    this.errorMessage = null; // Clear general messages
+    this.successMessage = null;
   }
 
-  /**
-   * Saves the updated question.
-   */
   saveEditedQuestion(): void {
-    if (this.editingQuestionId === null || !this.editingQuestionTitle.trim() || !this.editingQuestionContent.trim()) {
-      this.showError('Edited question title and content cannot be empty.');
+    if (!this.editingQuestion || !this.editingQuestion.title.trim()) {
+      this.cardErrorMessage = 'Edited question title cannot be empty.';
+      return;
+    }
+    if (!this.editingQuestion || !this.editingQuestion.content.trim()) {
+      this.cardErrorMessage = 'Edited question content cannot be empty.';
       return;
     }
 
-    const updatedQuestionRequest: QuestionRequest = {
-      title: this.editingQuestionTitle,
-      content: this.editingQuestionContent
+    const questionRequest: QuestionRequest = {
+      title: this.editingQuestion.title.trim(),
+      content: this.editingQuestion.content.trim()
     };
 
-    this.faqService.updateQuestion(this.editingQuestionId, updatedQuestionRequest).pipe(
-      tap(updatedQuestion => {
+    this.faqService.updateQuestion(this.editingQuestion.id, questionRequest).subscribe({
+      next: (updatedQuestion) => {
         const index = this.questions.findIndex(q => q.id === updatedQuestion.id);
         if (index !== -1) {
-          this.questions[index] = updatedQuestion; // Update the question in the local array
+          this.questions[index] = updatedQuestion;
         }
-        this.cancelEditQuestion();
-        this.showSuccess('Question updated successfully!');
-      }),
-      catchError(error => {
-        console.error('Error updating question:', error);
-        this.showError('Failed to update question. You might not have permission.');
-        return of(null);
-      })
-    ).subscribe();
+        this.successMessage = 'Question updated successfully!';
+        this.errorMessage = null;
+        this.cardErrorMessage = null; // Clear card-specific error on success
+        this.showEditQuestionCard = false;
+        this.editingQuestion = null;
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to update question: ' + (err.error?.message || err.message);
+        this.successMessage = null;
+        this.cardErrorMessage = null; // Clear card error if a server error occurs
+        console.error('FaqComponent: Error updating question:', err);
+      }
+    });
   }
 
-  /**
-   * Cancels the question editing process.
-   */
-  cancelEditQuestion(): void {
-    this.editingQuestionId = null;
-    this.editingQuestionTitle = '';
-    this.editingQuestionContent = '';
-    this.clearMessages();
+  cancelEditQuestionCard(): void {
+    this.showEditQuestionCard = false;
+    this.editingQuestion = null;
+    this.cardErrorMessage = null; // Clear card-specific error
+    this.errorMessage = null; // Clear general messages
+    this.successMessage = null;
   }
 
-  /**
-   * Deletes a question from the backend.
-   * @param questionId The ID of the question to delete.
-   */
+  // --- Delete Question ---
   deleteQuestion(questionId: number): void {
-    if (confirm('Are you sure you want to delete this question and all its answers?')) {
-      this.faqService.deleteQuestion(questionId).pipe(
-        tap(() => {
-          this.questions = this.questions.filter(q => q.id !== questionId);
-          this.showSuccess('Question deleted successfully!');
-        }),
-        catchError(error => {
-          console.error('Error deleting question:', error);
-          this.showError('Failed to delete question. You might not have permission.');
-          return of(null);
-        })
-      ).subscribe();
-    }
+    this.faqService.deleteQuestion(questionId).subscribe({
+      next: () => {
+        this.questions = this.questions.filter(q => q.id !== questionId);
+        this.successMessage = 'Question deleted successfully!';
+        this.errorMessage = null;
+        this.cardErrorMessage = null; // Clear card error as no card is active
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to delete question: ' + (err.error?.message || err.message);
+        this.successMessage = null;
+        this.cardErrorMessage = null;
+        console.error('FaqComponent: Error deleting question:', err);
+      }
+    });
   }
 
-  /**
-   * Posts a new answer to a specific question.
-   * @param questionId The ID of the question to answer.
-   */
+  // --- Answer (Reply) Logic ---
   postAnswer(questionId: number): void {
-    const answerContent = this.answerContent[questionId];
-    if (!answerContent || !answerContent.trim()) {
-      this.showError('Answer content cannot be empty.');
+    const content = this.answerContent[questionId];
+    if (!content || !content.trim()) {
+      // For answers, let's also use cardErrorMessage as it's typically tied to an input field
+      this.cardErrorMessage = 'Answer content cannot be empty.';
       return;
     }
 
-    const answerRequest: AnswerRequest = { content: answerContent };
+    const answerRequest: AnswerRequest = {
+      content: content.trim()
+    };
 
-    this.faqService.postAnswer(questionId, answerRequest).pipe(
-      tap(newAnswer => {
+    this.faqService.postAnswer(questionId, answerRequest).subscribe({
+      next: (newAnswer) => {
         const question = this.questions.find(q => q.id === questionId);
         if (question) {
-          question.answers.push(newAnswer); // Add new answer to the question's answers
+          question.answers.push(newAnswer);
+          this.answerContent[questionId] = '';
+          this.successMessage = 'Answer posted successfully!';
+          this.errorMessage = null;
+          this.cardErrorMessage = null; // Clear card-specific error on success
         }
-        this.answerContent[questionId] = ''; // Clear the input field for this question
-        this.showSuccess('Answer posted successfully!');
-      }),
-      catchError(error => {
-        console.error('Error posting answer:', error);
-        this.showError('Failed to post answer. Please ensure you are logged in and try again.');
-        return of(null);
-      })
-    ).subscribe();
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to post answer: ' + (err.error?.message || err.message);
+        this.successMessage = null;
+        this.cardErrorMessage = null;
+        console.error('FaqComponent: Error posting answer:', err);
+      }
+    });
   }
 
-  /**
-   * Initiates the editing process for an answer.
-   * @param answer The answer to edit.
-   */
   editAnswer(answer: Answer): void {
     this.editingAnswerId = answer.id;
     this.editingAnswerContent = answer.content;
-    this.clearMessages();
+    this.cardErrorMessage = null; // Clear card-specific error
+    this.errorMessage = null;
+    this.successMessage = null;
   }
 
-  /**
-   * Saves the updated answer.
-   * @param questionId The ID of the parent question.
-   */
   saveEditedAnswer(questionId: number): void {
-    if (this.editingAnswerId === null || !this.editingAnswerContent.trim()) {
-      this.showError('Edited answer content cannot be empty.');
+    if (!this.editingAnswerId || !this.editingAnswerContent.trim()) {
+      this.cardErrorMessage = 'Edited answer content cannot be empty.';
       return;
     }
 
-    const updatedAnswerRequest: AnswerRequest = { content: this.editingAnswerContent };
+    const answerRequest: AnswerRequest = {
+      content: this.editingAnswerContent.trim()
+    };
 
-    this.faqService.updateAnswer(this.editingAnswerId, updatedAnswerRequest).pipe(
-      tap(updatedAnswer => {
+    this.faqService.updateAnswer(this.editingAnswerId, answerRequest).subscribe({
+      next: (updatedAnswer) => {
         const question = this.questions.find(q => q.id === questionId);
         if (question) {
-          const index = question.answers.findIndex((a: Answer) => a.id === updatedAnswer.id);
+          const index = question.answers.findIndex(a => a.id === updatedAnswer.id);
           if (index !== -1) {
-            question.answers[index] = updatedAnswer; // Update the answer in the local array
+            question.answers[index] = updatedAnswer;
           }
         }
-        this.cancelEditAnswer();
-        this.showSuccess('Answer updated successfully!');
-      }),
-      catchError(error => {
-        console.error('Error updating answer:', error);
-        this.showError('Failed to update answer. You might not have permission.');
-        return of(null);
-      })
-    ).subscribe();
+        this.successMessage = 'Answer updated successfully!';
+        this.errorMessage = null;
+        this.cardErrorMessage = null; // Clear card-specific error on success
+        this.editingAnswerId = null;
+        this.editingAnswerContent = '';
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to update answer: ' + (err.error?.message || err.message);
+        this.successMessage = null;
+        this.cardErrorMessage = null;
+        console.error('FaqComponent: Error updating answer:', err);
+      }
+    });
   }
 
-  /**
-   * Cancels the answer editing process.
-   */
   cancelEditAnswer(): void {
     this.editingAnswerId = null;
     this.editingAnswerContent = '';
-    this.clearMessages();
+    this.cardErrorMessage = null; // Clear card-specific error
+    this.errorMessage = null;
+    this.successMessage = null;
   }
 
-  /**
-   * Deletes an answer from the backend.
-   * @param questionId The ID of the parent question.
-   * @param answerId The ID of the answer to delete.
-   */
-  deleteAnswer(questionId: number, answerId: number): void {
-    if (confirm('Are you sure you want to delete this answer?')) {
-      this.faqService.deleteAnswer(answerId).pipe(
-        tap(() => {
-          const question = this.questions.find(q => q.id === questionId);
-          if (question) {
-            question.answers = question.answers.filter((a: Answer) => a.id !== answerId);
-          }
-          this.showSuccess('Answer deleted successfully!');
-        }),
-        catchError(error => {
-          console.error('Error deleting answer:', error);
-          this.showError('Failed to delete answer. You might not have permission.');
-          return of(null);
-        })
-      ).subscribe();
+  // --- Delete Answer Method ---
+  deleteAnswer(answerId: number): void {
+    this.faqService.deleteAnswer(answerId).subscribe({
+      next: () => {
+        this.questions.forEach(q => {
+          q.answers = q.answers.filter(a => a.id !== answerId);
+        });
+        this.successMessage = 'Answer deleted successfully!';
+        this.errorMessage = null;
+        this.cardErrorMessage = null;
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to delete answer: ' + (err.error?.message || err.message);
+        this.successMessage = null;
+        this.cardErrorMessage = null;
+        console.error('FaqComponent: Error deleting answer:', err);
+      }
+    });
+  }
+
+  isAnyAnswerEditing(question: Question): boolean {
+    return question.answers.some(answer => this.editingAnswerId === answer.id);
+  }
+
+  // --- Helper Functions ---
+  formatDate(dateString: string): string {
+    if (!dateString) return 'N/A';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString();
+    } catch (e) {
+      console.error('Error formatting date:', dateString, e);
+      return 'Invalid Date';
     }
   }
 
-  /**
-   * Checks if the current user is the owner of the question/answer.
-   * This is a client-side check for UI display; backend will enforce security.
-   * @param userExternalId The external employee ID of the question/answer owner.
-   * @returns True if the current user is the owner, false otherwise.
-   */
-  isOwner(userExternalId: number): boolean {
-    return this.currentUserId !== null && this.currentUserId === userExternalId;
+  isManager(): boolean {
+    return this.currentUserRoles.includes('MANAGER');
   }
 
-  /**
-   * Checks if the current user has the 'ADMIN' role.
-   * @returns True if the user is an ADMIN, false otherwise.
-   */
-  isAdmin(): boolean {
-    return this.currentUserRoles.includes('ADMIN');
-  }
-
-  /**
-   * Formats a date string.
-   * @param dateString The date string to format.
-   * @returns Formatted date string or empty string if null.
-   */
-  formatDate(dateString: string | null): string {
-    return dateString ? this.datePipe.transform(dateString, 'medium') || '' : '';
-  }
-
-  /**
-   * Displays an error message.
-   * @param message The error message to display.
-   */
-  private showError(message: string): void {
-    this.errorMessage = message;
-    this.successMessage = null;
-    setTimeout(() => this.errorMessage = null, 5000); // Clear after 5 seconds
-  }
-
-  /**
-   * Displays a success message.
-   * @param message The success message to display.
-   */
-  private showSuccess(message: string): void {
-    this.successMessage = message;
-    this.errorMessage = null;
-    setTimeout(() => this.successMessage = null, 5000); // Clear after 5 seconds
-  }
-
-  /**
-   * Clears all messages.
-   */
-  private clearMessages(): void {
-    this.errorMessage = null;
-    this.successMessage = null;
+  isOwner(postUserId: number): boolean {
+    return this.currentUserId !== null && this.currentUserId === postUserId;
   }
 }

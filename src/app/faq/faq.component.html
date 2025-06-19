@@ -1,155 +1,178 @@
-<!-- src/app/faq/faq.component.html -->
+<div class="faq-container">
+  <h2 class="text-3xl font-bold text-center mb-8 mt-4">FAQ</h2>
 
-<div class="faq-container p-6 bg-gray-50 min-h-screen rounded-lg shadow-inner-lg">
-  <h2 class="text-3xl font-bold text-center text-blue-800 mb-8 mt-4">FAQ</h2>
+  <button class="add-question-button" (click)="togglePostQuestionCard()">
+    +
+  </button>
 
-  <!-- Messages -->
-  <div *ngIf="errorMessage" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md shadow-md" role="alert">
+  <div *ngIf="errorMessage" class="alert-message error-message" role="alert">
     <p class="font-bold">Error!</p>
     <p>{{ errorMessage }}</p>
   </div>
-  <div *ngIf="successMessage" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md shadow-md" role="alert">
+  <div *ngIf="successMessage" class="alert-message success-message" role="alert">
     <p class="font-bold">Success!</p>
     <p>{{ successMessage }}</p>
   </div>
 
-  <!-- Ask a New Question Section -->
-  <div class="mb-8 p-6 bg-white rounded-lg shadow-md border border-blue-200">
-    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Ask a New Question</h3>
-    <div class="mb-4">
-      <label for="newQuestionTitle" class="block text-gray-700 text-sm font-bold mb-2">Title:</label>
-      <input type="text" id="newQuestionTitle" [(ngModel)]="newQuestionTitle"
-             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 rounded-md"
-             placeholder="Enter a concise title for your question">
+  <div class="chat-container">
+    <h3 class="text-2xl font-semibold mb-4">Queries</h3>
+
+    <div *ngIf="questions.length === 0" class="empty-state">
+      No messages yet. Be the first to ask!
     </div>
-    <div class="mb-4">
-      <label for="newQuestionContent" class="block text-gray-700 text-sm font-bold mb-2">Details:</label>
-      <textarea id="newQuestionContent" [(ngModel)]="newQuestionContent" rows="4"
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 rounded-md"
-                placeholder="Provide more details about your question"></textarea>
+
+    <div *ngFor="let question of questions" class="chat-message-thread">
+
+      <div class="chat-item-wrapper" [class.current-user-item]="isOwner(question.userId)">
+        <div class="chat-message">
+          <div class="chat-header">
+            <img [src]="question.userProfilePictureUrl || 'https://placehold.co/50x50/cccccc/000000?text=User'"
+                 alt="User Profile" class="profile-pic mr-2">
+            <div class="info">
+              <div class="name-role">
+                <span class="font-bold text-sm">{{ question.userName }}</span>
+                <span *ngIf="question.userRole" class="job-title-tag">{{ question.userRole }}</span>
+              </div>
+              <div class="timestamp text-xs">{{ formatDate(question.postedAt) }}</div>
+            </div>
+          </div>
+
+          <h4 *ngIf="question.title" class="font-semibold text-md mb-1">{{ question.title }}</h4>
+          <p class="message-content text-sm">{{ question.content }}</p>
+
+          <div class="message-actions"
+               [class.active-actions]="(showEditQuestionCard && editingQuestion?.id === question.id) || isAnyAnswerEditing(question)">
+            <span class="reply-count">{{ question.answers.length }} replies</span>
+            <button *ngIf="isOwner(question.userId) || isManager()" (click)="openEditQuestionCard(question)"
+                    class="action-button edit-button">Edit</button>
+            <button *ngIf="isOwner(question.userId) || isManager()" (click)="deleteQuestion(question.id)"
+                    class="action-button delete-button">Delete</button>
+          </div>
+          </div>
+      </div>
+
+      <div *ngIf="question.answers.length > 0" class="answers-list">
+        <div *ngFor="let answer of question.answers" class="chat-item-wrapper" [class.current-user-item]="isOwner(answer.userId)">
+          <div class="chat-message reply-message">
+            <div class="chat-header">
+              <img [src]="answer.userProfilePictureUrl || 'https://placehold.co/40x40/cccccc/000000?text=User'"
+                   alt="User Profile" class="profile-pic-sm mr-2">
+              <div class="info">
+                <div class="name-role">
+                  <span class="font-semibold text-xs">{{ answer.userName }}</span>
+                  <span *ngIf="answer.userRole" class="role-tag">{{ answer.userRole }}</span>
+                </div>
+                <div class="timestamp text-xs">{{ formatDate(answer.postedAt) }}</div>
+              </div>
+            </div>
+
+            <div *ngIf="editingAnswerId !== answer.id">
+              <p class="message-content text-xs whitespace-pre-wrap mb-2">{{ answer.content }}</p>
+              <div class="message-actions small-actions"
+                   [class.active-actions]="editingAnswerId === answer.id">
+                <button *ngIf="isOwner(answer.userId) || isManager()" (click)="editAnswer(answer)"
+                        class="action-button edit-button">Edit</button>
+                <button *ngIf="isOwner(answer.userId) || isManager()" (click)="deleteAnswer(answer.id)"
+                        class="action-button delete-button">Delete</button>
+              </div>
+            </div>
+
+            <div *ngIf="editingAnswerId === answer.id" class="edit-form-sm">
+              <h4 class="text-sm font-semibold mb-1">Edit Reply</h4>
+              <div *ngIf="cardErrorMessage" class="alert-message error-message mb-2" role="alert">
+                <p class="font-bold">Validation Error!</p>
+                <p>{{ cardErrorMessage }}</p>
+              </div>
+              <div class="mb-2">
+                <textarea [(ngModel)]="editingAnswerContent" rows="1"
+                          class="input-field-sm"></textarea>
+              </div>
+              <div class="flex space-x-2 justify-end">
+                <button (click)="saveEditedAnswer(question.id)"
+                        class="save-button-sm">Save</button>
+                <button (click)="cancelEditAnswer()"
+                        class="cancel-button-sm">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="add-answer-form">
+        <div *ngIf="cardErrorMessage && !editingAnswerId" class="alert-message error-message mb-2" role="alert">
+          <p class="font-bold">Validation Error!</p>
+          <p>{{ cardErrorMessage }}</p>
+        </div>
+        <div class="flex items-end space-x-2">
+          <textarea id="answerContent_{{question.id}}" [(ngModel)]="answerContent[question.id]" rows="1"
+                    class="input-field-sm resize-none"
+                    placeholder="Reply to this message..."></textarea>
+          <button (click)="postAnswer(question.id)"
+                  class="reply-button">
+            Reply
+          </button>
+        </div>
+      </div>
     </div>
-    <button (click)="postQuestion()"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 rounded-md">
-      Post Question
-    </button>
   </div>
 
-  <!-- Questions List -->
-  <div class="questions-list space-y-6">
-    <h3 class="text-2xl font-semibold text-blue-700 mb-4">All Questions</h3>
-
-    <div *ngIf="questions.length === 0" class="text-center text-gray-500 py-8 bg-white rounded-lg shadow-md">
-      No questions posted yet. Be the first to ask!
+  <div *ngIf="showPostQuestionCard" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="text-2xl font-semibold mb-4">Ask a New Question</h3>
+      <div *ngIf="cardErrorMessage" class="alert-message error-message mb-4" role="alert">
+        <p class="font-bold">Validation Error!</p>
+        <p>{{ cardErrorMessage }}</p>
+      </div>
+      <div class="mb-4">
+        <label for="newQuestionTitle" class="block text-sm font-bold mb-2">Subject:</label>
+        <input type="text" id="newQuestionTitle" [(ngModel)]="newQuestionTitle"
+               class="input-field"
+               placeholder="Enter a subject for your message">
+      </div>
+      <div class="mb-4">
+        <label for="newQuestionContent" class="block text-sm font-bold mb-2">Message:</label>
+        <textarea id="newQuestionContent" [(ngModel)]="newQuestionContent" rows="3"
+                  class="input-field resize-none"
+                  placeholder="Type your message here..."></textarea>
+      </div>
+      <div class="flex space-x-2 justify-end">
+        <button (click)="postQuestion()"
+                class="save-button">
+          Send
+        </button>
+        <button (click)="togglePostQuestionCard()"
+                class="cancel-button">
+          Cancel
+        </button>
+      </div>
     </div>
+  </div>
 
-    <div *ngFor="let question of questions"
-         class="question-card bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200">
-      <div class="flex items-start mb-4">
-        <img [src]="question.userProfilePictureUrl || '[https://placehold.co/50x50/cccccc/000000?text=User](https://placehold.co/50x50/cccccc/000000?text=User)'"
-             alt="User Profile" class="w-12 h-12 rounded-full mr-4 object-cover">
-        <div>
-          <div class="font-bold text-gray-900 text-lg">{{ question.userName }}
-            <span *ngIf="question.userRole" class="ml-2 text-sm font-medium text-blue-600 px-2 py-0.5 bg-blue-100 rounded-full">{{ question.userRole }}</span>
-          </div>
-          <div class="text-gray-500 text-sm">Posted: {{ formatDate(question.postedAt) }}</div>
-          <div *ngIf="question.lastUpdatedAt && question.postedAt !== question.lastUpdatedAt" class="text-gray-500 text-sm">
-            Last updated: {{ formatDate(question.lastUpdatedAt) }}
-          </div>
-        </div>
+  <div *ngIf="showEditQuestionCard && editingQuestion" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="text-2xl font-semibold mb-4">Edit Question</h3>
+      <div *ngIf="cardErrorMessage" class="alert-message error-message mb-4" role="alert">
+        <p class="font-bold">Validation Error!</p>
+        <p>{{ cardErrorMessage }}</p>
       </div>
-
-      <!-- Display Question -->
-      <div *ngIf="editingQuestionId !== question.id">
-        <h4 class="text-xl font-bold text-gray-800 mb-2">{{ question.title }}</h4>
-        <p class="text-gray-700 mb-4 whitespace-pre-wrap">{{ question.content }}</p>
-        
-        <!-- Question Actions -->
-        <div class="flex items-center space-x-3 text-sm text-gray-600 mb-4">
-          <span class="font-semibold">{{ question.answers.length }} replies</span>
-          <button *ngIf="isOwner(question.userExternalId) || isAdmin()" (click)="editQuestion(question)"
-                  class="text-blue-500 hover:text-blue-700 font-medium transition duration-200">Edit</button>
-          <button *ngIf="isOwner(question.userExternalId) || isAdmin()" (click)="deleteQuestion(question.id)"
-                  class="text-red-500 hover:text-red-700 font-medium transition duration-200">Delete</button>
-        </div>
+      <div class="mb-4">
+        <label for="editQuestionCardTitle" class="block text-sm font-bold mb-2">Subject:</label>
+        <input type="text" id="editQuestionCardTitle" [(ngModel)]="editingQuestion.title"
+               class="input-field">
       </div>
-
-      <!-- Edit Question Form -->
-      <div *ngIf="editingQuestionId === question.id" class="p-4 bg-gray-100 rounded-lg shadow-inner mb-4">
-        <h4 class="text-lg font-semibold text-gray-800 mb-2">Edit Question</h4>
-        <div class="mb-3">
-          <label for="editQuestionTitle_{{question.id}}" class="block text-gray-700 text-sm font-bold mb-1">Title:</label>
-          <input type="text" id="editQuestionTitle_{{question.id}}" [(ngModel)]="editingQuestionTitle"
-                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 rounded-md">
-        </div>
-        <div class="mb-3">
-          <label for="editQuestionContent_{{question.id}}" class="block text-gray-700 text-sm font-bold mb-1">Content:</label>
-          <textarea id="editQuestionContent_{{question.id}}" [(ngModel)]="editingQuestionContent" rows="3"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 rounded-md"></textarea>
-        </div>
-        <div class="flex space-x-2">
-          <button (click)="saveEditedQuestion()"
-                  class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-3 rounded-full text-sm shadow-md transition duration-300 rounded-md">Save</button>
-          <button (click)="cancelEditQuestion()"
-                  class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-1.5 px-3 rounded-full text-sm shadow-md transition duration-300 rounded-md">Cancel</button>
-        </div>
+      <div class="mb-4">
+        <label for="editQuestionCardContent" class="block text-sm font-bold mb-2">Message:</label>
+        <textarea id="editQuestionCardContent" [(ngModel)]="editingQuestion.content" rows="3"
+                  class="input-field resize-none"></textarea>
       </div>
-
-      <!-- Answers Section -->
-      <div *ngIf="question.answers.length > 0" class="answers-list mt-4 ml-6 pl-4 border-l-2 border-gray-300 space-y-4">
-        <div *ngFor="let answer of question.answers"
-             class="answer-card bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-100">
-          <div class="flex items-start mb-3">
-            <img [src]="answer.userProfilePictureUrl || '[https://placehold.co/40x40/cccccc/000000?text=User](https://placehold.co/40x40/cccccc/000000?text=User)'"
-                 alt="User Profile" class="w-10 h-10 rounded-full mr-3 object-cover">
-            <div>
-              <div class="font-semibold text-gray-800">{{ answer.userName }}
-                <span *ngIf="answer.userRole" class="ml-1 text-xs font-medium text-purple-600 px-1.5 py-0.5 bg-purple-100 rounded-full">{{ answer.userRole }}</span>
-              </div>
-              <div class="text-gray-500 text-xs">Replied: {{ formatDate(answer.postedAt) }}</div>
-              <div *ngIf="answer.lastUpdatedAt && answer.postedAt !== answer.lastUpdatedAt" class="text-gray-500 text-xs">
-                Last updated: {{ formatDate(answer.lastUpdatedAt) }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Display Answer -->
-          <div *ngIf="editingAnswerId !== answer.id">
-            <p class="text-gray-700 whitespace-pre-wrap mb-3">{{ answer.content }}</p>
-            <!-- Answer Actions -->
-            <div class="flex items-center space-x-2 text-xs text-gray-500">
-              <button *ngIf="isOwner(answer.userExternalId) || isAdmin()" (click)="editAnswer(answer)"
-                      class="text-blue-500 hover:text-blue-700 font-medium transition duration-200">Edit</button>
-              <button *ngIf="isOwner(answer.userExternalId) || isAdmin()" (click)="deleteAnswer(question.id, answer.id)"
-                      class="text-red-500 hover:text-red-700 font-medium transition duration-200">Delete</button>
-            </div>
-          </div>
-
-          <!-- Edit Answer Form -->
-          <div *ngIf="editingAnswerId === answer.id" class="p-3 bg-gray-100 rounded-lg shadow-inner">
-            <h4 class="text-md font-semibold text-gray-800 mb-2">Edit Answer</h4>
-            <div class="mb-3">
-              <textarea [(ngModel)]="editingAnswerContent" rows="2"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 rounded-md"></textarea>
-            </div>
-            <div class="flex space-x-2">
-              <button (click)="saveEditedAnswer(question.id)"
-                      class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-2 rounded-full text-xs shadow-md transition duration-300 rounded-md">Save</button>
-              <button (click)="cancelEditAnswer()"
-                      class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-1 px-2 rounded-full text-xs shadow-md transition duration-300 rounded-md">Cancel</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add Answer Form -->
-      <div class="add-answer-form mt-4 pt-4 border-t border-gray-200">
-        <label for="answerContent_{{question.id}}" class="block text-gray-700 text-sm font-bold mb-2">Your Answer:</label>
-        <textarea id="answerContent_{{question.id}}" [(ngModel)]="answerContent[question.id]" rows="2"
-                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 rounded-md"
-                  placeholder="Type your answer here..."></textarea>
-        <button (click)="postAnswer(question.id)"
-                class="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 rounded-md text-sm">
-          Submit Answer
+      <div class="flex space-x-2 justify-end">
+        <button (click)="saveEditedQuestion()"
+                class="save-button">
+          Save
+        </button>
+        <button (click)="cancelEditQuestionCard()"
+                class="cancel-button">
+          Cancel
         </button>
       </div>
     </div>
