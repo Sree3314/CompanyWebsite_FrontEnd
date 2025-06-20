@@ -35,7 +35,7 @@ export class AppComponent {
     // MODIFIED LINE: Added (loggedIn: boolean) type annotation
     this.authSubscription = this.authService.isLoggedIn$.subscribe((loggedIn: boolean) => {
       this.isLoggedIn = loggedIn;
-      console.log('App Component: Login status changed to:', loggedIn);
+     // console.log('App Component: Login status changed to:', loggedIn);
     });
   }
 
