@@ -23,11 +23,11 @@
   </nav>
 
   <hr>
-
   <div *ngIf="isManager && showJobPostForm" class="job-post-form card-layout p-6 bg-white rounded-lg shadow-md mt-5">
     <h2 class="text-2xl font-bold mb-6 text-gray-800">Post a New Job</h2>
     <form (ngSubmit)="submitJob()">
-      <p *ngIf="jobPostMessage" [class.success]="jobPostMessage.includes('successfully')"
+      <p *ngIf="jobPostMessage"
+         [class.success]="jobPostMessage.includes('successfully')"
          [class.error]="!jobPostMessage.includes('successfully')"
          class="mb-4 p-3 rounded-md text-sm"
          [class.bg-green-100]="jobPostMessage.includes('successfully')"
@@ -35,8 +35,7 @@
          [class.border-green-400]="jobPostMessage.includes('successfully')"
          [class.bg-red-100]="!jobPostMessage.includes('successfully')"
          [class.text-red-700]="!jobPostMessage.includes('successfully')"
-         [class.border-red-400]="!jobPostMessage.includes('successfully')"
-      >
+         [class.border-red-400]="!jobPostMessage.includes('successfully')" >
         {{ jobPostMessage }}
       </p>
 
@@ -62,9 +61,12 @@
       </div>
 
       <div class="form-group mb-4">
-        <label for="salary" class="block text-gray-700 text-sm font-semibold mb-2">Salary:</label>
-        <input type="text" id="salary" [(ngModel)]="newJob.salary" name="salary" required
-               class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+        <label for="salary" class="block text-gray-700 text-sm font-semibold mb-2">Salary Range (in Lakhs INR):</label>
+        <select id="salary" [(ngModel)]="newJob.salary" name="salary" required
+                class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+          <option value="">Select Salary Range</option>
+          <option *ngFor="let range of salaryRanges" [value]="range">{{ range }}</option>
+        </select>
         <span *ngIf="jobFormErrors.salary" class="error-message text-red-600 text-xs italic mt-1">{{ jobFormErrors.salary }}</span>
       </div>
 
@@ -76,7 +78,7 @@
           <option value="Full-time">Full-time</option>
           <option value="Part-time">Part-time</option>
           <option value="Contract">Contract</option>
-          <option value="Internship">Intern-ship</option>
+          <option value="Internship">Internship</option>
         </select>
         <span *ngIf="jobFormErrors.jobType" class="error-message text-red-600 text-xs italic mt-1">{{ jobFormErrors.jobType }}</span>
       </div>
@@ -111,6 +113,7 @@
       </div>
     </form>
   </div>
+
 
   <div *ngIf="isManager && showViewApplications" class="applications-list-container">
     <div class="section-header">

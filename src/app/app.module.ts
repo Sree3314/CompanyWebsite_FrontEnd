@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms'; // For ngModel
 
 // Components that are NOT standalone must be declared here
 import { AppComponent } from './app.component'; // AppComponent is standalone, but might be here for other reasons
-import { FAQComponent } from './faq/faq.component'; // Import FAQComponent (now standalone)
+import { FaqComponent } from './faq/faq.component'; // Import FAQComponent (now standalone)
 import { JobPortalComponent } from './job-portal/job-portal.component';
 import { ExhibitionComponent } from './exhibition/exhibition.component';
 import { SignInSignUpComponent } from './sign-in-sign-up/sign-in-sign-up.component';
@@ -20,17 +20,19 @@ import { DashboardComponent } from './dashboard/dashboard.component'; // Assumin
     // Remove FAQComponent from declarations since it's now standalone
     // AppComponent, // AppComponent is standalone and bootstrapped in main.ts
     // FAQComponent, // REMOVE THIS LINE
-    JobPortalComponent,
-    ExhibitionComponent,
-    SignInSignUpComponent,
-    HomeComponent // Declare HomeComponent if it's not standalone
+   
+    // Declare HomeComponent if it's not standalone
   ],
   imports: [
     BrowserModule,
     CommonModule, // Required for common Angular directives like *ngIf, *ngFor
     FormsModule,  // Required for ngModel and form handling
     DashboardComponent, // Import DashboardComponent here because it's marked as `standalone: true`
-    FAQComponent // IMPORTANT: Import FAQComponent here because it's now standalone
+    FaqComponent,
+    JobPortalComponent,
+    ExhibitionComponent,
+    SignInSignUpComponent,
+    HomeComponent // IMPORTANT: Import FAQComponent here because it's now standalone
     // Removed AppRoutingModule and RouterModule.forRoot(routes) as routing is now handled by app.config.ts
   ],
   providers: [

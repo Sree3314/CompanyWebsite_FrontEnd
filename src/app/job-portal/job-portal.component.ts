@@ -1,3 +1,4 @@
+// job-portal.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -65,7 +66,7 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     skillsRequired: ''
   };
   jobPostMessage: string = '';
-  jobFormErrors: JobPostErrors = {};
+  jobFormErrors: JobPostErrors = {}; // This object will hold your field-specific errors
   // For Apply Now functionality (User Role)
   showApplyForm: boolean = false;
   selectedJobForApplication: Job | null = null;
@@ -76,7 +77,9 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     yearsOfExperience: 0
   };
   applicationMessage: string = '';
+  applicationFormErrors: ApplicationFormErrors = {}; // Errors for the application form
 
+  salaryRanges: string[] = ['4-6 Lakhs INR', '6-9 Lakhs INR', '9-12 Lakhs INR', '12-15 Lakhs INR', '15-20 Lakhs INR', '20+ Lakhs INR'];
   // To track user's own applications to disable 'Apply Now' button
   private myApplicationsSubject = new BehaviorSubject<Application[]>([]); // NEW: Source of truth for user's applications
   myApplications$: Observable<Application[]>; // Expose as Observable
@@ -205,7 +208,11 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     };
     this.jobFormErrors = {}; // NEW: Clear all errors when form is closed or opened
   }
+
   submitJob(): void {
+    this.jobPostMessage = ''; // Clear previous general messages
+    this.jobFormErrors = {}; // Clear previous field-specific errors
+
     this.jobService.postJob(this.newJob).subscribe({
       next: (response) => {
         this.jobPostMessage = 'Job posted successfully!';
@@ -214,8 +221,19 @@ export class JobPortalComponent implements OnInit, OnDestroy {
         this.loadAllJobs(); // Reload jobs to include the new one (will update jobsSubject)
       },
       error: (error: HttpErrorResponse) => {
-        this.jobPostMessage = 'Error posting job: ' + (error.error?.message || 'Please try again.');
         console.error('Job post error:', error);
+        // Set a general error message
+        this.jobPostMessage = 'Failed to post job. Please check the form for errors below.';
+
+        // Check if the error response contains field-specific errors
+        if (error.status === 400 && error.error && typeof error.error === 'object') {
+          // Assuming the backend sends errors like:
+          // { experienceLevel: 'Experience level cannot be empty', skillsRequired: 'Skills required cannot be empty', ... }
+          this.jobFormErrors = error.error as JobPostErrors;
+        } else {
+          // Fallback for other types of errors or unexpected format
+          this.jobPostMessage = 'Error posting job: ' + (error.error?.message || error.message || 'An unexpected error occurred. Please try again.');
+        }
       }
     });
   }
@@ -225,7 +243,8 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     if (job.id) {
       this.applicationFormData.jobId = job.id;
       this.showApplyForm = true;
-      this.applicationMessage = '';
+      this.applicationMessage = ''; // Clear previous messages
+      this.applicationFormErrors = {}; // Clear previous errors
     } else {
       console.error('Job ID is missing for selected job:', job);
       this.applicationFormData = { jobId: 0, resumeLink: '', skills: '', yearsOfExperience: 0 };
@@ -237,6 +256,8 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     this.showApplyForm = false;
     this.selectedJobForApplication = null;
     this.applicationFormData = { jobId: 0, resumeLink: '', skills: '', yearsOfExperience: 0 };
+    this.applicationMessage = ''; // Clear message on close
+    this.applicationFormErrors = {}; // Clear errors on close
   }
 
   submitApplication(): void {
@@ -244,6 +265,9 @@ export class JobPortalComponent implements OnInit, OnDestroy {
       this.applicationMessage = 'No job selected or job ID missing for application.';
       return;
     }
+
+    this.applicationMessage = ''; // Clear previous general messages
+    this.applicationFormErrors = {}; // Clear previous field-specific errors
 
     this.applicationService.applyForJob(this.applicationFormData).subscribe({
       next: (response) => {
@@ -255,8 +279,17 @@ export class JobPortalComponent implements OnInit, OnDestroy {
         }
       },
       error: (error: HttpErrorResponse) => {
-        this.applicationMessage = 'Error submitting application: ' + (error.error?.message || 'Please try again.');
         console.error('Application error:', error);
+        // Set a general error message
+        this.applicationMessage = 'Error submitting application. Please check the form for errors below.';
+
+        // Check if the error response contains field-specific errors
+        if (error.status === 400 && error.error && typeof error.error === 'object') {
+          this.applicationFormErrors = error.error as ApplicationFormErrors;
+        } else {
+          // Fallback for other types of errors or unexpected format
+          this.applicationMessage = 'Error submitting application: ' + (error.error?.message || error.message || 'An unexpected error occurred. Please try again.');
+        }
       }
     });
   }
