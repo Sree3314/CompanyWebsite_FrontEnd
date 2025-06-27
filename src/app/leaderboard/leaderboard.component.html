@@ -1,0 +1,109 @@
+<!-- src/app/components/leaderboard/leaderboard.component.html -->
+
+<div class="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-green-100 p-6 font-sans antialiased">
+    <!-- Tailwind CSS CDN - Ensure this is loaded in your index.html or global styles if not using CLI build -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+    <style>
+      /* Custom styles for a cleaner font and possibly subtle table animations */
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      /* Add a subtle hover effect for table rows */
+      .table-row-hover:hover {
+        background-color: #f0f8ff; /* Light azure for hover */
+        transition: background-color 0.2s ease-in-out;
+      }
+      /* Specific styling for the rank column to make it pop */
+      .rank-cell {
+        font-weight: 700; /* Bold */
+        color: #4f46e5; /* Indigo-600 */
+        font-size: 1.125rem; /* lg text */
+      }
+    </style>
+  
+    <header class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-8 rounded-xl shadow-2xl mb-10 transform hover:scale-105 transition-transform duration-300 ease-in-out">
+      <h1 class="text-4xl font-extrabold text-center tracking-tight leading-tight">
+        <span class="block animate-fade-in-down">Employee Excellence Hub</span>
+        <span class="block text-2xl font-medium text-purple-200 mt-2">Average Project Rating Leaderboard</span>
+      </h1>
+    </header>
+  
+    <main class="max-w-4xl mx-auto">
+      <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-indigo-300 pb-3">
+          Top Performers
+        </h2>
+  
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="text-center py-12 text-indigo-600 animate-pulse">
+          <svg class="mx-auto h-12 w-12 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 0020 13a8 8 0 00-15.356-2m15.356 2H21V9m-9 3h.01"></path>
+          </svg>
+          <p class="mt-4 text-lg">Loading leaderboard data...</p>
+        </div>
+  
+        <!-- Error State -->
+        <div *ngIf="errorMessage" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-6 shadow-md" role="alert">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="font-bold text-lg">Error!</p>
+              <p class="text-sm">{{ errorMessage }}</p>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Leaderboard Table -->
+        <div *ngIf="!isLoading && !errorMessage && leaderboardData.length > 0" class="overflow-x-auto rounded-xl shadow-lg border border-gray-100">
+          <table class="min-w-full divide-y divide-blue-200">
+            <thead class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white">
+              <tr>
+                <th scope="col" class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider rounded-tl-xl">
+                  Rank
+                </th>
+                <th scope="col" class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider">
+                  Employee Name
+                </th>
+                <th scope="col" class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider rounded-tr-xl">
+                  Average Project Rating
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+              <tr *ngFor="let entry of leaderboardData; let i = index" class="{{ i % 2 === 0 ? 'bg-white' : 'bg-blue-50' }} table-row-hover">
+                <td class="px-6 py-4 whitespace-nowrap text-sm rank-cell">
+                  {{ i + 1 }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-base font-medium text-gray-900">
+                  {{ entry.firstName }} {{ entry.lastName }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-base text-gray-800">
+                  <span class="font-bold text-indigo-700">{{ entry.averageRating | number:'1.2-2' }}</span> / 5.00
+                  <span *ngIf="entry.averageRating >= 4.5" class="ml-2 text-yellow-500 text-lg">&#9733;</span> <!-- Star for high ratings -->
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+  
+        <!-- No Data State -->
+        <div *ngIf="!isLoading && !errorMessage && leaderboardData.length === 0" class="bg-blue-50 border-l-4 border-blue-400 text-blue-700 p-6 rounded-lg shadow-md flex items-center justify-center">
+          <svg class="h-8 w-8 mr-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <p class="font-bold text-lg">No Data Available</p>
+            <p class="text-sm">There is no average project rating data to display on the leaderboard at this time.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  

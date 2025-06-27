@@ -11,7 +11,7 @@ import { JobPortalComponent } from './job-portal/job-portal.component';
 import { ExhibitionComponent } from './exhibition/exhibition.component';
 import { SignInSignUpComponent } from './sign-in-sign-up/sign-in-sign-up.component';
 import { HomeComponent } from './home/home.component'; // Assuming HomeComponent is not standalone
-
+import {LeaderboardComponent} from './leaderboard/leaderboard.component'; // Import LeaderboardComponent
 // Components that ARE standalone must be imported here
 import { DashboardComponent } from './dashboard/dashboard.component'; // Assuming the file is dashboard.component.ts
 
@@ -32,6 +32,7 @@ import { DashboardComponent } from './dashboard/dashboard.component'; // Assumin
     JobPortalComponent,
     ExhibitionComponent,
     SignInSignUpComponent,
+    LeaderboardComponent,
     HomeComponent // IMPORTANT: Import FAQComponent here because it's now standalone
     // Removed AppRoutingModule and RouterModule.forRoot(routes) as routing is now handled by app.config.ts
   ],

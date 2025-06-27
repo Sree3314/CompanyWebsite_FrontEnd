@@ -13,7 +13,8 @@ export interface UserProfileResponse {
   contactInformation: string;
   department: string;
   jobTitle: string;
-  profilePictureUrl: string; // Optional field
+  profilePictureUrl: string; 
+  role:string;// Optional field
   // Add other properties if your DTO has them
 }
 

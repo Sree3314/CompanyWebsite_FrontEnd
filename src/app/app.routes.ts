@@ -6,7 +6,9 @@ import { JobPortalComponent } from './job-portal/job-portal.component';
 import { ExhibitionComponent } from './exhibition/exhibition.component';
 import { SignInSignUpComponent } from './sign-in-sign-up/sign-in-sign-up.component';
 import { DashboardComponent } from './dashboard/dashboard.component'; 
-import { AuthGuard } from './guards/auth.guard';// Assuming you have a DashboardComponent
+import { AuthGuard } from './guards/auth.guard';
+import {LeaderboardComponent} from './leaderboard/leaderboard.component'; // Import LeaderboardComponent
+// Assuming you have a DashboardComponent
 export const routes: Routes = [
   // This is the missing route that fixes the loop!
   { path: 'home', component: HomeComponent },
@@ -15,10 +17,7 @@ export const routes: Routes = [
   { path: 'job-portal', component: JobPortalComponent },
   { path: 'exhibition', component: ExhibitionComponent },
   {path:'signin_signup', component:SignInSignUpComponent},
-  // Assuming 'signin' is a placeholder or you have a SigninComponent
-  // { path: 'signin', component: SigninComponent },
-  // OR for lazy loading (if you implemented it this way):
-  // { path: 'signin', loadComponent: () => import('./path-to-your-signin-component/signin.component').then(m => m.SigninComponent) },
+  {path: 'leaderboard', component: LeaderboardComponent}, // Route for the leaderboard
 {path: 'dashboard', component: DashboardComponent,canActivate:[AuthGuard]}, // Route for the dashboard
 
   // Redirect to the home path when the URL is empty
@@ -28,6 +27,6 @@ export const routes: Routes = [
 
   // Redirect any unknown paths to the home path (this is now safe because /home is defined)
   { path: '**', redirectTo: '/home' }
-  // Assuming ExhibitionComponent route is already defined, this adds the details route
+ 
 
 ];
