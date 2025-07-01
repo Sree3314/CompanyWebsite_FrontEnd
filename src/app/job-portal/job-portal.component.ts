@@ -43,9 +43,14 @@ export class JobPortalComponent implements OnInit, OnDestroy {
   // Jobs
   private jobsSubject = new BehaviorSubject<Job[]>([]); // NEW: Source of truth for all jobs
   jobs$: Observable<Job[]>; // Expose as Observable
+
+  // --- START OF JOB SEARCH FIX ---
+  // Keep jobSearchQuery for [(ngModel)] binding in the template
+  jobSearchQuery: string = '';
+  // NEW: Subject to emit changes from the search input
+  private jobSearchQuerySubject = new BehaviorSubject<string>('');
   filteredJobs$: Observable<Job[]>; // Observable for filtered jobs
-  jobSearchQuery: string = ''; // Search query for jobs
-  // private jobsList: Job[] = []; // No longer strictly needed for filtering due to BehaviorSubject, but can keep for direct access if needed.
+  // --- END OF JOB SEARCH FIX ---
 
   // Applications
   allApplications: Application[] = [];
@@ -103,14 +108,14 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     this.jobs$ = this.jobsSubject.asObservable(); // Initialize jobs$ from the subject
     this.myApplications$ = this.myApplicationsSubject.asObservable(); // Initialize myApplications$ from its subject
 
-    // Initialize filteredJobs$ to react to changes in jobsSubject and jobSearchQuery
+    // Initialize filteredJobs$ to react to changes in jobsSubject and jobSearchQuerySubject
     this.filteredJobs$ = combineLatest([
       this.jobsSubject.asObservable(), // Listen to changes in the raw job list
-      // Listen to changes in the search query, with debounce for performance
-      of(this.jobSearchQuery).pipe(
+      // Listen to changes in the search query from the new subject
+      this.jobSearchQuerySubject.asObservable().pipe( // Changed from of(this.jobSearchQuery)
         debounceTime(300), // Wait 300ms after last keystroke
         distinctUntilChanged(), // Only emit if the value is different
-        startWith(this.jobSearchQuery) // Emit initial value
+        startWith('') // Emit initial empty string, as no query is typed initially
       )
     ]).pipe(
       map(([jobs, query]) => {
@@ -161,13 +166,13 @@ export class JobPortalComponent implements OnInit, OnDestroy {
     }
     this.jobsSubject.complete(); // Clean up subjects
     this.myApplicationsSubject.complete();
+    this.jobSearchQuerySubject.complete(); // NEW: Clean up the jobSearchQuerySubject
   }
 
   loadAllJobs(): void {
     this.jobService.getAllJobs().pipe(
       tap(jobs => {
         this.jobsSubject.next(jobs); // Push the new list of jobs to the subject
-        // this.jobsList = jobs; // This line is now redundant for filtering, but can be kept if needed for other direct array manipulations.
         console.log('Loaded All Jobs:', jobs);
       }),
       catchError((error: HttpErrorResponse) => {
@@ -180,9 +185,8 @@ export class JobPortalComponent implements OnInit, OnDestroy {
 
   // Method to filter jobs based on search query
   onJobSearch(): void {
-    // The filtering logic is now handled reactively by filteredJobs$
-    // We just need to trigger a change in jobSearchQuery to make it re-evaluate
-    // This is implicitly handled by [(ngModel)] binding, but if you had a separate search button, this would be its handler.
+    // NEW: Emit the current value of the input field to the subject
+    this.jobSearchQuerySubject.next(this.jobSearchQuery);
   }
 
   /**
