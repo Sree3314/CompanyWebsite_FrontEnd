@@ -1,298 +1,311 @@
-/* General Body Styles */
+/* app.component.css */
+
+/* Global Layout for Sticky Footer - IMPORTANT */
+html {
+  height: 100%; /* Make HTML element fill the viewport height */
+  box-sizing: border-box; /* Good practice: Includes padding/border in element's total width/height */
+}
+
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background-color: white; /* Base background */
-    color: #333; /* Default text color */
-  }
-  
-  .homepage-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  /* Header Styles */
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    background-color: #001f3f; /* Dark Blue */
-    color: white;
-    border-radius: 8px;
-    margin-bottom: 30px;
-  }
-  
-  .logo-section {
-    display: flex;
-    align-items: center;
-    padding-left: 20px;
-  }
-  
-  .company-logo {
-    height: 56px;      /* Slightly larger logo */
-    width: 56px;
-    margin-right: 4px; /* Minimal space between logo and name */
-    vertical-align: middle;
-  }
-  
-  .company-name {
-    margin: 0;
-    display: inline-block;
-    vertical-align: middle;
-    font-size: 2em;    /* Keep company name size reasonable */
-  }
-  
-  .navigation {
-    padding-right: 20px;
-  }
-  
-  .nav-link {
-    color: white;
-    text-decoration: none;
-    margin-left: 25px;
-    font-weight: bold;
-    transition: color 0.3s ease;
-  }
-  
-  .nav-link:hover {
-    color: #add8e6; /* Lighter blue on hover */
-  }
-  
-  .sign-in-up {
-    background-color: white;
-    color: #001f3f; /* Dark Blue */
-    padding: 8px 15px;
-    border-radius: 5px;
-    text-transform: uppercase;
-    font-size: 0.9em;
-  }
-  
-  .sign-in-up:hover {
-    background-color: #f0f0f0;
-  }
-  
-  /* Hero Section Styles */
-  .hero-section {
-    display: flex;
-    align-items: center;
-    gap: 40px;
-    padding: 50px 0;
-    background-color: white;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 40px;
-  }
-  
-  .hero-image-container {
-    flex: 1;
-    text-align: center;
-  }
-  
-  .hero-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .about-company-content {
-    flex: 1;
-  }
-  
-  .about-company-content h2 {
-    color: #001f3f; /* Dark Blue */
-    font-size: 2.5em;
-    margin-bottom: 20px;
-  }
-  
-  .about-company-content p {
-    line-height: 1.8;
-    color: #555;
-    font-size: 1.1em;
-  }
-  
-  /* Services Section Styles */
-  .services-section {
-    padding: 40px 0;
-    text-align: center;
-    margin-bottom: 40px;
-  }
-  
-  .services-section h2 {
-    color: #001f3f; /* Dark Blue */
-    font-size: 2.5em;
-    margin-bottom: 50px;
-  }
-  
-  .service-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 60px;
-    gap: 40px;
-    background-color: #f8f8f8; /* Slightly off-white for service blocks */
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  }
-  
-  .service-item:nth-child(even) { /* For alternating layout */
-    flex-direction: row-reverse;
-  }
-  
-  .service-image-container {
-    flex: 1;
-    text-align: center;
-  }
-  
-  .service-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .service-content {
-    flex: 1;
-    text-align: left;
-  }
-  
-  .service-content h3 {
-    color: #001f3f; /* Dark Blue */
-    font-size: 1.8em;
-    margin-bottom: 15px;
-  }
-  
-  .service-content p {
-    color: #666;
-    line-height: 1.7;
-  }
-  
-  /* Achievements Section Styles */
-  .achievements-section {
-    padding: 40px 0;
-    text-align: center;
-    margin-bottom: 40px;
-  }
-  
-  .achievements-section h2 {
-    color: #001f3f; /* Dark Blue */
-    font-size: 2.5em;
-    margin-bottom: 50px;
-  }
-  
-  .achievement-cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    justify-content: center;
-  }
-  
-  .achievement-card {
-    background-color: #001f3f; /* Dark Blue */
-    color: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: left;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .achievement-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  }
-  
-  .achievement-card h3 {
-    font-size: 1.5em;
-    margin-bottom: 15px;
-    color: white;
-  }
-  
-  .achievement-card p {
-    font-size: 1em;
-    line-height: 1.6;
-    color: #f0f0f0;
-  }
-  
-  /* Footer Styles (Optional) */
-  .footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #001f3f; /* Dark Blue */
-    color: white;
-    margin-top: 50px;
-    border-radius: 8px;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .header {
-      flex-direction: column;
-      text-align: center;
-      padding-bottom: 10px;
-    }
-  
-    .navigation {
-      margin-top: 20px;
-      padding-right: 0;
-    }
-  
-    .nav-link {
-      margin: 0 10px 10px 10px;
-      display: inline-block;
-    }
-  
-    .hero-section {
-      flex-direction: column;
-      text-align: center;
-    }
-  
-    .service-item {
-      flex-direction: column !important; /* Override alternating for smaller screens */
-    }
-  
-    .service-content, .service-image-container {
-      flex: none; /* Reset flex for single column */
-      width: 100%;
-    }
-  
-    .service-content {
-      text-align: center;
-      margin-top: 20px;
-    }
-  
-    .achievement-cards-container {
-      grid-template-columns: 1fr;
-    }
-    /* app.component.css */
-/* Existing styles... */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background-color: white; /* Base background */
+  color: #333; /* Default text color */
+  height: 100%; /* Make body fill the HTML height (essential for min-height: 100vh on body/app-root) */
+  display: flex; /* Make body a flex container */
+  flex-direction: column; /* Stack children (header, app-root, footer) vertically */
+  min-height: 100vh; /* Ensure body takes at least the full viewport height */
+}
+
+/* This targets the host element of your root Angular component (e.g., <app-root>) */
+app-root { /* Adjust 'app-root' if your root component's selector is different */
+  display: flex; /* Make app-root a flex container */
+  flex-direction: column; /* Stack its children vertically */
+  flex: 1; /* CRITICAL: Makes app-root grow to fill available space and push the footer down */
+}
+
+/* Header Styles */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  background-color: #001f3f; /* Dark Blue */
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 30px; /* This margin adds space below the header */
+  flex-shrink: 0; /* Prevents header from shrinking if content is long */
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+}
+
+.company-logo {
+  height: 56px; /* Slightly larger logo */
+  width: 56px;
+  margin-right: 4px; /* Minimal space between logo and name */
+  vertical-align: middle;
+}
+
+.company-name {
+  margin: 0;
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 2em; /* Keep company name size reasonable */
+}
+
+.navigation {
+  padding-right: 20px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  margin-left: 25px;
+  font-weight: bold;
+  transition: color 0.3s ease;
+  padding: 0.5rem 1rem; /* Consistent padding with logout button */
+}
+
+.nav-link:hover {
+  color: #add8e6; /* Lighter blue on hover */
+}
+
+.sign-in-up {
+  background-color: white;
+  color: #001f3f; /* Dark Blue */
+  padding: 8px 15px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  font-size: 0.9em;
+}
+
+.sign-in-up:hover {
+  background-color: #f0f0f0;
+}
 
 .logout-button {
   background-color: transparent;
   border: none;
-  color: #007bff; /* Or whatever your nav-link color is */
+  color: white; /* Changed to white to match other nav links in header */
   cursor: pointer;
-  padding: 0.5rem 1rem; /* Adjust as needed */
+  padding: 0.5rem 1rem; /* Adjust as needed, matching nav-link padding */
   font-size: 1rem; /* Match other nav links */
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, text-decoration 0.3s ease; /* Added text-decoration to transition */
+  font-weight: bold; /* Make it bold like other nav links */
 }
 
 .logout-button:hover {
-  color: #0056b3; /* Darker shade on hover */
+  color: #add8e6; /* Lighter blue on hover, consistent with nav-link */
   text-decoration: underline;
 }
 
-/* Ensure nav-links also have consistent padding/margin */
-.nav-link {
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  color: #007bff; /* Example color */
-  transition: color 0.3s ease;
+
+/* Homepage Container (if your homepage content is directly within app.component.html) */
+/* This is important if your homepage content is NOT routed and is instead a direct child of app-root */
+.homepage-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  flex: 1; /* Allow the main content area (homepage) to grow */
+  display: flex; /* Make it a flex container too, if it has internal layout needs */
+  flex-direction: column; /* If its internal children should stack */
 }
 
-.nav-link:hover {
-  color: #0056b3;
-  text-decoration: underline;
+/* Hero Section Styles */
+.hero-section {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 50px 0;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 40px;
 }
+
+.hero-image-container {
+  flex: 1;
+  text-align: center;
+}
+
+.hero-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.about-company-content {
+  flex: 1;
+}
+
+.about-company-content h2 {
+  color: #001f3f; /* Dark Blue */
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+.about-company-content p {
+  line-height: 1.8;
+  color: #555;
+  font-size: 1.1em;
+}
+
+/* Services Section Styles */
+.services-section {
+  padding: 40px 0;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.services-section h2 {
+  color: #001f3f; /* Dark Blue */
+  font-size: 2.5em;
+  margin-bottom: 50px;
+}
+
+.service-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 60px;
+  gap: 40px;
+  background-color: #f8f8f8; /* Slightly off-white for service blocks */
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.service-item:nth-child(even) { /* For alternating layout */
+  flex-direction: row-reverse;
+}
+
+.service-image-container {
+  flex: 1;
+  text-align: center;
+}
+
+.service-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.service-content {
+  flex: 1;
+  text-align: left;
+}
+
+.service-content h3 {
+  color: #001f3f; /* Dark Blue */
+  font-size: 1.8em;
+  margin-bottom: 15px;
+}
+
+.service-content p {
+  color: #666;
+  line-height: 1.7;
+}
+
+/* Achievements Section Styles */
+.achievements-section {
+  padding: 40px 0;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.achievements-section h2 {
+  color: #001f3f; /* Dark Blue */
+  font-size: 2.5em;
+  margin-bottom: 50px;
+}
+
+.achievement-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  justify-content: center;
+}
+
+.achievement-card {
+  background-color: #001f3f; /* Dark Blue */
+  color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.achievement-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.achievement-card h3 {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+  color: white;
+}
+
+.achievement-card p {
+  font-size: 1em;
+  line-height: 1.6;
+  color: #f0f0f0;
+}
+
+/* Footer Styles */
+.footer {
+  flex-shrink: 0; /* Ensures the footer does not shrink and stays at its defined height */
+  text-align: center;
+  padding: 20px;
+  background-color: #001f3f; /* Dark Blue */
+  color: white;
+  margin-top: 50px; /* This margin adds space ABOVE the footer */
+  border-radius: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header {
+      flex-direction: column;
+      text-align: center;
+      padding-bottom: 10px;
   }
+
+  .navigation {
+      margin-top: 20px;
+      padding-right: 0;
+  }
+
+  .nav-link {
+      margin: 0 10px 10px 10px;
+      display: inline-block;
+  }
+
+  .hero-section {
+      flex-direction: column;
+      text-align: center;
+  }
+
+  .service-item {
+      flex-direction: column !important; /* Override alternating for smaller screens */
+  }
+
+  .service-content, .service-image-container {
+      flex: none; /* Reset flex for single column */
+      width: 100%;
+  }
+
+  .service-content {
+      text-align: center;
+      margin-top: 20px;
+  }
+
+  .achievement-cards-container {
+      grid-template-columns: 1fr;
+  }
+}
