@@ -1,243 +1,261 @@
-<!-- Load Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<!-- Load Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: {
-          sans: ['Inter', 'sans-serif'],
-        },
-        keyframes: {
-          fadeIn: {
-            '0%': { opacity: '0' },
-            '100%': { opacity: '1' },
-          },
-          slideInUp: {
-            '0%': { transform: 'translateY(20px)', opacity: '0' },
-            '100%': { transform: 'translateY(0)', opacity: '1' },
-          },
-        },
-        animation: {
-          fadeIn: 'fadeIn 0.5s ease-out forwards',
-          slideInUp: 'slideInUp 0.5s ease-out forwards',
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                },
+                keyframes: {
+                    fadeIn: {
+                        '0%': { opacity: '0' },
+                        '100%': { opacity: '1' },
+                    },
+                    slideInUp: {
+                        '0%': { transform: 'translateY(20px)', opacity: '0' },
+                        '100%': { transform: 'translateY(0)', opacity: '1'},
+                    },
+                    spin: {
+                        'from': { transform: 'rotate(0deg)' },
+                        'to': { transform: 'rotate(360deg)' },
+                    }
+                },
+                animation: {
+                    fadeIn: 'fadeIn 0.5s ease-out forwards',
+                    slideInUp: 'slideInUp 0.5s ease-out forwards',
+                    spin: 'spin 1s linear infinite',
+                }
+            }
         }
-      }
     }
-  }
 </script>
 
-<div class="min-h-screen flex items-center justify-center  font-sans p-4">
-  <div class="bg-white rounded-xl shadow-2xl p-8 md:p-10 w-full max-w-md animate-fadeIn">
+<div class="min-h-screen flex items-center justify-center font-sans p-4 bg-gray-100">
+    <div class="bg-white rounded-xl shadow-2xl p-8 md:p-10 w-full max-w-md animate-fadeIn">
 
-    <!-- Global Messages (Success/Error) -->
-    <p *ngIf="successMessage" class="bg-green-100 text-green-800 border border-green-300 px-4 py-3 rounded-md mb-6 animate-slideInUp text-center text-sm">
-      <i class="fas fa-check-circle mr-2"></i> {{ successMessage }}
-    </p>
-    <p *ngIf="errorMessage" class="bg-red-100 text-red-800 border border-red-300 px-4 py-3 rounded-md mb-6 animate-slideInUp text-center text-sm">
-      <i class="fas fa-exclamation-triangle mr-2"></i> {{ errorMessage }}
-    </p>
-
-    <!-- Sign In Form -->
-    <div *ngIf="!showSignUpForm && !showForgotPasswordForm && !showResetPasswordForm" class="animate-slideInUp">
-      <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Sign In</h2>
-      <form (ngSubmit)="onSignIn()">
-        <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
-          <input type="email" id="email" name="email" [(ngModel)]="signInData.email" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                 [class.border-red-500]="signInErrors.email">
-          <p *ngIf="signInErrors.email" class="text-red-600 text-xs mt-1">{{ signInErrors.email }}</p>
-        </div>
-        <div class="mb-6">
-          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password:</label>
-          <input type="password" id="password" name="password" [(ngModel)]="signInData.password" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                 [class.border-red-500]="signInErrors.password">
-          <p *ngIf="signInErrors.password" class="text-red-600 text-xs mt-1">{{ signInErrors.password }}</p>
-        </div>
-        <p *ngIf="signInErrors.nonFieldErrors" class="text-red-600 text-sm mb-4 text-center">{{ signInErrors.nonFieldErrors }}</p>
-        <button type="submit"
-                class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 ease-in-out transform hover:scale-105">
-          Sign In
-        </button>
-      </form>
-      <div class="mt-6 text-center text-gray-600">
-        <p>Don't have an account?
-          <button (click)="toggleForm()" class="text-indigo-600 hover:text-indigo-800 font-medium ml-1">Create Account</button>
+        <p *ngIf="successMessage" class="bg-green-100 text-green-800 border border-green-300 px-4 py-3 rounded-md mb-6 animate-slideInUp text-center text-sm">
+            <i class="fas fa-check-circle mr-2"></i> {{ successMessage }}
         </p>
-        <p class="mt-2">
-          <button (click)="goToForgotPassword()" class="text-indigo-600 hover:text-indigo-800 font-medium">Forgot Password?</button>
+        <p *ngIf="errorMessage" class="bg-red-100 text-red-800 border border-red-300 px-4 py-3 rounded-md mb-6 animate-slideInUp text-center text-sm">
+            <i class="fas fa-exclamation-triangle mr-2"></i> {{ errorMessage }}
         </p>
-      </div>
-    </div>
 
-    <!-- Sign Up Form -->
-    <div *ngIf="showSignUpForm" class="animate-slideInUp">
-      <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Sign Up</h2>
-      <form (ngSubmit)="onSignUp()">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label for="employeeId" class="block text-sm font-medium text-gray-700 mb-1">Employee ID:</label>
-            <input type="number" id="employeeId" name="employeeId" [(ngModel)]="signUpData.employeeId" required
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                   [class.border-red-500]="signUpErrors.employeeId">
-            <p *ngIf="signUpErrors.employeeId" class="text-red-600 text-xs mt-1">{{ signUpErrors.employeeId }}</p>
-          </div>
-          <div>
-            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name:</label>
-            <input type="text" id="firstName" name="firstName" [(ngModel)]="signUpData.firstName" required
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                   [class.border-red-500]="signUpErrors.firstName">
-            <p *ngIf="signUpErrors.firstName" class="text-red-600 text-xs mt-1">{{ signUpErrors.firstName }}</p>
-          </div>
-          <div>
-            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name:</label>
-            <input type="text" id="lastName" name="lastName" [(ngModel)]="signUpData.lastName" required
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                   [class.border-red-500]="signUpErrors.lastName">
-            <p *ngIf="signUpErrors.lastName" class="text-red-600 text-xs mt-1">{{ signUpErrors.lastName }}</p>
-          </div>
-          <div>
-            <label for="signUpEmail" class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
-            <input type="email" id="signUpEmail" name="signUpEmail" [(ngModel)]="signUpData.email" required
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                   [class.border-red-500]="signUpErrors.email">
-            <p *ngIf="signUpErrors.email" class="text-red-600 text-xs mt-1">{{ signUpErrors.email }}</p>
-          </div>
+        <div *ngIf="!showSignUpForm && !showForgotPasswordForm && !showResetPasswordForm" class="animate-slideInUp">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Sign In</h2>
+            <form (ngSubmit)="onSignIn()">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+                    <input type="email" id="email" name="email" [(ngModel)]="signInData.email" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                           [class.border-red-500]="signInErrors.email">
+                    <p *ngIf="signInErrors.email" class="text-red-600 text-xs mt-1">{{ signInErrors.email }}</p>
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password:</label>
+                    <input type="password" id="password" name="password" [(ngModel)]="signInData.password" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                           [class.border-red-500]="signInErrors.password">
+                    <p *ngIf="signInErrors.password" class="text-red-600 text-xs mt-1">{{ signInErrors.password }}</p>
+                </div>
+                <p *ngIf="signInErrors.nonFieldErrors" class="text-red-600 text-sm mb-4 text-center">{{ signInErrors.nonFieldErrors }}</p>
+                <button type="submit"
+                        class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 ease-in-out transform hover:scale-105">
+                    Sign In
+                </button>
+            </form>
+            <div class="mt-6 text-center text-gray-600">
+                <p>Don't have an account?
+                    <button (click)="toggleForm()" class="text-indigo-600 hover:text-indigo-800 font-medium ml-1">Create Account</button>
+                </p>
+                <p class="mt-2">
+                    <button (click)="goToForgotPassword()" class="text-indigo-600 hover:text-indigo-800 font-medium">Forgot Password?</button>
+                </p>
+            </div>
         </div>
-        <div class="mb-4">
-          <label for="signUpPassword" class="block text-sm font-medium text-gray-700 mb-1">Password:</label>
-          <input type="password" id="signUpPassword" name="signUpPassword" [(ngModel)]="signUpData.password" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                 [class.border-red-500]="signUpErrors.password">
-          <p *ngIf="signUpErrors.password" class="text-red-600 text-xs mt-1">{{ signUpErrors.password }}</p>
-        </div>
-        <div class="mb-4">
-          <label for="contactInformation" class="block text-sm font-medium text-gray-700 mb-1">Contact Information:</label>
-          <input type="text" id="contactInformation" name="contactInformation" [(ngModel)]="signUpData.contactInformation" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                 [class.border-red-500]="signUpErrors.contactInformation">
-          <p *ngIf="signUpErrors.contactInformation" class="text-red-600 text-xs mt-1">{{ signUpErrors.contactInformation }}</p>
-        </div>
-        <div class="mb-4">
-          <label for="department" class="block text-sm font-medium text-gray-700 mb-1">Department:</label>
-          <input type="text" id="department" name="department" [(ngModel)]="signUpData.department" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                 [class.border-red-500]="signUpErrors.department">
-          <p *ngIf="signUpErrors.department" class="text-red-600 text-xs mt-1">{{ signUpErrors.department }}</p>
-        </div>
-        <div class="mb-4">
-          <label for="jobTitle" class="block text-sm font-medium text-gray-700 mb-1">Job Title:</label>
-          <select id="jobTitle" name="jobTitle" [(ngModel)]="signUpData.jobTitle" required
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                  [class.border-red-500]="signUpErrors.jobTitle">
-            <option value="" disabled selected>Select your job title</option>
-            <optgroup label="Manager Roles" class="font-semibold text-gray-800">
-              <option value="Software Engineering Manager">Software Engineering Manager</option>
-              <option value="Technical Lead">Technical Lead</option>
-              <option value="Project Manager">Project Manager</option>
-              <option value="Product Manager">Product Manager</option>
-              <option value="Scrum Master">Scrum Master</option>
-              <option value="Director of Engineering">Director of Engineering</option>
-              <option value="Engineering Manager">Engineering Manager</option>
-              <option value="Solutions Architect (with leadership focus)">Solutions Architect (with leadership focus)</option>
-              <option value="Release Manager">Release Manager</option>
-              <option value="IT Manager">IT Manager</option>
-            </optgroup>
-            <optgroup label="Employee Roles" class="font-semibold text-gray-800">
-              <option value="Software Developer (Backend)">Software Developer (Backend)</option>
-              <option value="Frontend Engineer">Frontend Engineer</option>
-              <option value="Mobile App Developer (Android)">Mobile App Developer (Android)</option>
-              <option value="Quality Assurance (QA) Engineer">Quality Assurance (QA) Engineer</option>
-              <option value="DevOps Engineer">DevOps Engineer</option>
-              <option value="Data Scientist">Data Scientist</option>
-              <option value="UX Designer">UX Designer</option>
-              <option value="Full-Stack Developer">Full-Stack Developer</option>
-              <option value="Cloud Engineer">Cloud Engineer</option>
-              <option value="Site Reliability Engineer (SRE)">Site Reliability Engineer (SRE)</option>
-            </optgroup>
-          </select>
-          <p *ngIf="signUpErrors.jobTitle" class="text-red-600 text-xs mt-1">{{ signUpErrors.jobTitle }}</p>
-        </div>
-        <div class="mb-6">
-          <label for="personalEmail" class="block text-sm font-medium text-gray-700 mb-1">Personal Email:</label>
-          <input type="email" id="personalEmail" name="personalEmail" [(ngModel)]="signUpData.personalEmail" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                 [class.border-red-500]="signUpErrors.personalEmail">
-          <p *ngIf="signUpErrors.personalEmail" class="text-red-600 text-xs mt-1">{{ signUpErrors.personalEmail }}</p>
-        </div>
-        <p *ngIf="signUpErrors.nonFieldErrors" class="text-red-600 text-sm mb-4 text-center">{{ signUpErrors.nonFieldErrors }}</p>
-        <button type="submit"
-                class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 ease-in-out transform hover:scale-105">
-          Sign Up
-        </button>
-      </form>
-      <p class="mt-6 text-center text-gray-600">Already have an account?
-        <button type="button" (click)="toggleForm()" class="text-indigo-600 hover:text-indigo-800 font-medium ml-1">Sign In</button>
-      </p>
-    </div>
 
-    <!-- Forgot Password Form -->
-    <div *ngIf="showForgotPasswordForm" class="animate-slideInUp">
-      <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Forgot Password</h2>
-      <p class="text-gray-600 mb-6 text-center">Enter your personal email to receive a password reset OTP.</p>
-      <form (ngSubmit)="onRequestOtp()">
-        <div class="mb-6">
-          <label for="forgotPasswordEmail" class="block text-sm font-medium text-gray-700 mb-1">Personal Email:</label>
-          <input type="email" id="forgotPasswordEmail" name="forgotPasswordEmail" [(ngModel)]="forgotPasswordEmail" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                 [class.border-red-500]="forgotPasswordErrors.personalEmail">
-          <p *ngIf="forgotPasswordErrors.personalEmail" class="text-red-600 text-xs mt-1">{{ forgotPasswordErrors.personalEmail }}</p>
-        </div>
-        <p *ngIf="forgotPasswordErrors.nonFieldErrors" class="text-red-600 text-sm mb-4 text-center">{{ forgotPasswordErrors.nonFieldErrors }}</p>
-        <button type="submit"
-                class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 ease-in-out transform hover:scale-105">
-          Send OTP
-        </button>
-      </form>
-      <p class="mt-6 text-center">
-        <button type="button" (click)="backToSignIn()" class="text-indigo-600 hover:text-indigo-800 font-medium">Back to Sign In</button>
-      </p>
-    </div>
+        <div *ngIf="showSignUpForm" class="animate-slideInUp">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Sign Up</h2>
+            <form (ngSubmit)="onSignUp()">
+                <div class="mb-4">
+                    <button type="button" (click)="onFetchEmployeeDetails()"
+                            [disabled]="isFetchingEmployeeDetails || !signUpData.employeeId"
+                            class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 ease-in-out text-sm mb-2"
+                            [class.opacity-50]="isFetchingEmployeeDetails || !signUpData.employeeId"
+                            [class.cursor-not-allowed]="isFetchingEmployeeDetails || !signUpData.employeeId">
+                        <span *ngIf="!isFetchingEmployeeDetails">Fetch Details by Employee ID</span>
+                        <i *ngIf="isFetchingEmployeeDetails" class="fas fa-spinner fa-spin mr-2"></i>
+                        <span *ngIf="isFetchingEmployeeDetails">Fetching...</span>
+                    </button>
+                </div>
 
-    <!-- Reset Password Form -->
-    <div *ngIf="showResetPasswordForm" class="animate-slideInUp">
-      <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Reset Password</h2>
-      <p class="text-gray-600 mb-6 text-center">Enter the OTP sent to your personal email and your new password.</p>
-      <form (ngSubmit)="onResetPassword()">
-        <div class="mb-4">
-          <label for="orgEmail" class="block text-sm font-medium text-gray-700 mb-1">Organization Email:</label>
-          <input type="email" id="orgEmail" name="orgEmail" [(ngModel)]="resetPasswordData.organizationEmail" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                 [class.border-red-500]="resetPasswordErrors.organizationEmail">
-          <p *ngIf="resetPasswordErrors.organizationEmail" class="text-red-600 text-xs mt-1">{{ resetPasswordErrors.organizationEmail }}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="employeeId" class="block text-sm font-medium text-gray-700 mb-1">Employee ID:</label>
+                        <input type="number" id="employeeId" name="employeeId" [(ngModel)]="signUpData.employeeId" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                               [class.border-red-500]="signUpErrors.employeeId"
+                               [readonly]="employeeDetailsFetched"
+                               [class.bg-gray-200]="employeeDetailsFetched">
+                        <p *ngIf="signUpErrors.employeeId" class="text-red-600 text-xs mt-1">{{ signUpErrors.employeeId }}</p>
+                    </div>
+                    <div>
+                        <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name:</label>
+                        <input type="text" id="firstName" name="firstName" [(ngModel)]="signUpData.firstName" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                               [class.border-red-500]="signUpErrors.firstName"
+                               [readonly]="employeeDetailsFetched"
+                               [class.bg-gray-200]="employeeDetailsFetched">
+                        <p *ngIf="signUpErrors.firstName" class="text-red-600 text-xs mt-1">{{ signUpErrors.firstName }}</p>
+                    </div>
+                    <div>
+                        <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name:</label>
+                        <input type="text" id="lastName" name="lastName" [(ngModel)]="signUpData.lastName" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                               [class.border-red-500]="signUpErrors.lastName"
+                               [readonly]="employeeDetailsFetched"
+                               [class.bg-gray-200]="employeeDetailsFetched">
+                        <p *ngIf="signUpErrors.lastName" class="text-red-600 text-xs mt-1">{{ signUpErrors.lastName }}</p>
+                    </div>
+                    <div>
+                        <label for="signUpEmail" class="block text-sm font-medium text-gray-700 mb-1">Email (Organization):</label>
+                        <input type="email" id="signUpEmail" name="signUpEmail" [(ngModel)]="signUpData.email" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                               [class.border-red-500]="signUpErrors.email"
+                               [readonly]="employeeDetailsFetched"
+                               [class.bg-gray-200]="employeeDetailsFetched">
+                        <p *ngIf="signUpErrors.email" class="text-red-600 text-xs mt-1">{{ signUpErrors.email }}</p>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="signUpPassword" class="block text-sm font-medium text-gray-700 mb-1">Password:</label>
+                    <input type="password" id="signUpPassword" name="signUpPassword" [(ngModel)]="signUpData.password" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                           [class.border-red-500]="signUpErrors.password">
+                    <p *ngIf="signUpErrors.password" class="text-red-600 text-xs mt-1">{{ signUpErrors.password }}</p>
+                </div>
+                <div class="mb-4">
+                    <label for="contactInformation" class="block text-sm font-medium text-gray-700 mb-1">Contact Information:</label>
+                    <input type="text" id="contactInformation" name="contactInformation" [(ngModel)]="signUpData.contactInformation" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                           [class.border-red-500]="signUpErrors.contactInformation">
+                    <p *ngIf="signUpErrors.contactInformation" class="text-red-600 text-xs mt-1">{{ signUpErrors.contactInformation }}</p>
+                </div>
+                <div class="mb-4">
+                    <label for="department" class="block text-sm font-medium text-gray-700 mb-1">Department:</label>
+                    <input type="text" id="department" name="department" [(ngModel)]="signUpData.department" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                           [class.border-red-500]="signUpErrors.department">
+                    <p *ngIf="signUpErrors.department" class="text-red-600 text-xs mt-1">{{ signUpErrors.department }}</p>
+                </div>
+                <div class="mb-4">
+                    <label for="jobTitle" class="block text-sm font-medium text-gray-700 mb-1">Job Title:</label>
+                    <select id="jobTitle" name="jobTitle" [(ngModel)]="signUpData.jobTitle" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                            [class.border-red-500]="signUpErrors.jobTitle">
+                        <option value="" disabled selected>Select your job title</option>
+                        <optgroup label="Manager Roles" class="font-semibold text-gray-800">
+                            <option value="Software Engineering Manager">Software Engineering Manager</option>
+                            <option value="Technical Lead">Technical Lead</option>
+                            <option value="Project Manager">Project Manager</option>
+                            <option value="Product Manager">Product Manager</option>
+                            <option value="Scrum Master">Scrum Master</option>
+                            <option value="Director of Engineering">Director of Engineering</option>
+                            <option value="Engineering Manager">Engineering Manager</option>
+                            <option value="Solutions Architect (with leadership focus)">Solutions Architect (with leadership focus)</option>
+                            <option value="Release Manager">Release Manager</option>
+                            <option value="IT Manager">IT Manager</option>
+                        </optgroup>
+                        <optgroup label="Employee Roles" class="font-semibold text-gray-800">
+                            <option value="Software Developer (Backend)">Software Developer (Backend)</option>
+                            <option value="Frontend Engineer">Frontend Engineer</option>
+                            <option value="Mobile App Developer (Android)">Mobile App Developer (Android)</option>
+                            <option value="Quality Assurance (QA) Engineer">Quality Assurance (QA) Engineer</option>
+                            <option value="DevOps Engineer">DevOps Engineer</option>
+                            <option value="Data Scientist">Data Scientist</option>
+                            <option value="UX Designer">UX Designer</option>
+                            <option value="Full-Stack Developer">Full-Stack Developer</option>
+                            <option value="Cloud Engineer">Cloud Engineer</option>
+                            <option value="Site Reliability Engineer (SRE)">Site Reliability Engineer (SRE)</option>
+                        </optgroup>
+                    </select>
+                    <p *ngIf="signUpErrors.jobTitle" class="text-red-600 text-xs mt-1">{{ signUpErrors.jobTitle }}</p>
+                </div>
+                <div class="mb-6">
+                    <label for="personalEmail" class="block text-sm font-medium text-gray-700 mb-1">Personal Email:</label>
+                    <input type="email" id="personalEmail" name="personalEmail" [(ngModel)]="signUpData.personalEmail" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                           [class.border-red-500]="signUpErrors.personalEmail">
+                    <p *ngIf="signUpErrors.personalEmail" class="text-red-600 text-xs mt-1">{{ signUpErrors.personalEmail }}</p>
+                </div>
+                <p *ngIf="signUpErrors.nonFieldErrors" class="text-red-600 text-sm mb-4 text-center">{{ signUpErrors.nonFieldErrors }}</p>
+                <button type="submit"
+                        class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 ease-in-out transform hover:scale-105">
+                    Sign Up
+                </button>
+            </form>
+            <p class="mt-6 text-center text-gray-600">Already have an account?
+                <button type="button" (click)="toggleForm()" class="text-indigo-600 hover:text-indigo-800 font-medium ml-1">Sign In</button>
+            </p>
         </div>
-        <div class="mb-4">
-          <label for="otp" class="block text-sm font-medium text-gray-700 mb-1">OTP:</label>
-          <input type="text" id="otp" name="otp" [(ngModel)]="resetPasswordData.token" required maxlength="6"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                 [class.border-red-500]="resetPasswordErrors.token">
-          <p *ngIf="resetPasswordErrors.token" class="text-red-600 text-xs mt-1">{{ resetPasswordErrors.token }}</p>
-        </div>
-        <div class="mb-6">
-          <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-1">New Password:</label>
-          <input type="password" id="newPassword" name="newPassword" [(ngModel)]="resetPasswordData.newPassword" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
-                 [class.border-red-500]="resetPasswordErrors.newPassword">
-          <p *ngIf="resetPasswordErrors.newPassword" class="text-red-600 text-xs mt-1">{{ resetPasswordErrors.newPassword }}</p>
-        </div>
-        <p *ngIf="resetPasswordErrors.nonFieldErrors" class="text-red-600 text-sm mb-4 text-center">{{ resetPasswordErrors.nonFieldErrors }}</p>
-        <button type="submit"
-                class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 ease-in-out transform hover:scale-105">
-          Reset Password
-        </button>
-      </form>
-      <p class="mt-6 text-center">
-        <button (click)="backToSignIn()" class="text-indigo-600 hover:text-indigo-800 font-medium">Back to Sign In</button>
-      </p>
-    </div>
 
-  </div>
+        <div *ngIf="showForgotPasswordForm" class="animate-slideInUp">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Forgot Password</h2>
+            <p class="text-gray-600 mb-6 text-center">Enter your personal email to receive a password reset OTP.</p>
+            <form (ngSubmit)="onRequestOtp()">
+                <div class="mb-6">
+                    <label for="forgotPasswordEmail" class="block text-sm font-medium text-gray-700 mb-1">Personal Email:</label>
+                    <input type="email" id="forgotPasswordEmail" name="forgotPasswordEmail" [(ngModel)]="forgotPasswordEmail" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                           [class.border-red-500]="forgotPasswordErrors.personalEmail">
+                    <p *ngIf="forgotPasswordErrors.personalEmail" class="text-red-600 text-xs mt-1">{{ forgotPasswordErrors.personalEmail }}</p>
+                </div>
+                <p *ngIf="forgotPasswordErrors.nonFieldErrors" class="text-red-600 text-sm mb-4 text-center">{{ forgotPasswordErrors.nonFieldErrors }}</p>
+                <button type="submit"
+                        class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 ease-in-out transform hover:scale-105">
+                    Send OTP
+                </button>
+            </form>
+            <p class="mt-6 text-center">
+                <button type="button" (click)="backToSignIn()" class="text-indigo-600 hover:text-indigo-800 font-medium">Back to Sign In</button>
+            </p>
+        </div>
+
+        <div *ngIf="showResetPasswordForm" class="animate-slideInUp">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">Reset Password</h2>
+            <p class="text-gray-600 mb-6 text-center">Enter the OTP sent to your personal email and your new password.</p>
+            <form (ngSubmit)="onResetPassword()">
+                <div class="mb-4">
+                    <label for="orgEmail" class="block text-sm font-medium text-gray-700 mb-1">Organization Email:</label>
+                    <input type="email" id="orgEmail" name="orgEmail" [(ngModel)]="resetPasswordData.organizationEmail" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                           [class.border-red-500]="resetPasswordErrors.organizationEmail">
+                    <p *ngIf="resetPasswordErrors.organizationEmail" class="text-red-600 text-xs mt-1">{{ resetPasswordErrors.organizationEmail }}</p>
+                </div>
+                <div class="mb-4">
+                    <label for="otp" class="block text-sm font-medium text-gray-700 mb-1">OTP:</label>
+                    <input type="text" id="otp" name="otp" [(ngModel)]="resetPasswordData.token" required maxlength="6"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                           [class.border-red-500]="resetPasswordErrors.token">
+                    <p *ngIf="resetPasswordErrors.token" class="text-red-600 text-xs mt-1">{{ resetPasswordErrors.token }}</p>
+                </div>
+                <div class="mb-6">
+                    <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-1">New Password:</label>
+                    <input type="password" id="newPassword" name="newPassword" [(ngModel)]="resetPasswordData.newPassword" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                           [class.border-red-500]="resetPasswordErrors.newPassword">
+                    <p *ngIf="resetPasswordErrors.newPassword" class="text-red-600 text-xs mt-1">{{ resetPasswordErrors.newPassword }}</p>
+                </div>
+                <p *ngIf="resetPasswordErrors.nonFieldErrors" class="text-red-600 text-sm mb-4 text-center">{{ resetPasswordErrors.nonFieldErrors }}</p>
+                <button type="submit"
+                        class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 ease-in-out transform hover:scale-105">
+                    Reset Password
+                </button>
+            </form>
+            <p class="mt-6 text-center">
+                <button (click)="backToSignIn()" class="text-indigo-600 hover:text-indigo-800 font-medium">Back to Sign In</button>
+            </p>
+        </div>
+
+    </div>
 </div>

@@ -1,17 +1,18 @@
+// src/app/sign-in-sign-up.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http'; // Import HttpErrorResponse
+import { HttpErrorResponse } from '@angular/common/http';
 
-import { SignInRequest, SignUpRequest, ResetPasswordRequest, MessageResponse } from '../models/auth.model'; // Import new interfaces
+import { SignInRequest, SignUpRequest, ResetPasswordRequest, MessageResponse, EmployeeDetails } from '../models/auth.model';
 
 // Interfaces for form-specific error messages
 interface SignInErrors {
   email?: string;
   password?: string;
-  nonFieldErrors?: string; // For general errors not tied to a specific field
+  nonFieldErrors?: string;
 }
 
 interface SignUpErrors {
@@ -44,13 +45,13 @@ interface ResetPasswordErrors {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './sign-in-sign-up.component.html',
-  styleUrls: ['./sign-in-sign-up.component.css'] // Keep this for now, will be removed after full Tailwind conversion
+  styleUrls: ['./sign-in-sign-up.component.css']
 })
 export class SignInSignUpComponent implements OnInit {
   // Form State Variables
   showSignUpForm: boolean = false;
   showForgotPasswordForm: boolean = false;
-  showResetPasswordForm: boolean = false; // To show the form for OTP & New Password
+  showResetPasswordForm: boolean = false;
 
   // Data Models for Forms
   signInData: SignInRequest = {
@@ -59,7 +60,7 @@ export class SignInSignUpComponent implements OnInit {
   };
 
   signUpData: SignUpRequest = {
-    employeeId: '',
+    employeeId: null as any, // Initialize as null and expect number input
     firstName: '',
     lastName: '',
     email: '',
@@ -70,10 +71,10 @@ export class SignInSignUpComponent implements OnInit {
     personalEmail: ''
   };
 
-  forgotPasswordEmail: string = ''; // For the "forgot password" email input
-  resetPasswordData: ResetPasswordRequest = { // For the "reset password" form
+  forgotPasswordEmail: string = '';
+  resetPasswordData: ResetPasswordRequest = {
     organizationEmail: '',
-    token: '', // This will be the OTP
+    token: '',
     newPassword: ''
   };
 
@@ -87,6 +88,11 @@ export class SignInSignUpComponent implements OnInit {
   forgotPasswordErrors: ForgotPasswordErrors = {};
   resetPasswordErrors: ResetPasswordErrors = {};
 
+  // Loading indicator for fetching employee details
+  isFetchingEmployeeDetails: boolean = false;
+  // NEW: State to control read-only fields after details are fetched
+  employeeDetailsFetched: boolean = false;
+
   constructor(
     private authService: AuthService,
     private router: Router
@@ -94,7 +100,7 @@ export class SignInSignUpComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/home']); // Changed from /dashboard to /home as per job-portal usage
+      this.router.navigate(['/home']);
     }
   }
 
@@ -107,6 +113,20 @@ export class SignInSignUpComponent implements OnInit {
     this.showForgotPasswordForm = false; // Hide forgot password form
     this.showResetPasswordForm = false; // Hide reset password form
     this.clearAllMessagesAndErrors();
+    // Clear signup data when switching away, especially employeeId for fresh lookup
+    this.signUpData = {
+      employeeId: null as any, // Reset to null
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      contactInformation: '',
+      department: '',
+      jobTitle: '',
+      personalEmail: ''
+    };
+    // NEW: Reset employeeDetailsFetched when switching forms
+    this.employeeDetailsFetched = false;
   }
 
   /**
@@ -160,7 +180,6 @@ export class SignInSignUpComponent implements OnInit {
     this.authService.signUp(this.signUpData).subscribe({
       next: (response: MessageResponse) => { // Expecting MessageResponse
         console.log('SignUp successful:', response);
-        // Use a custom message box/modal instead of window.alert
         this.successMessage = response.message || 'Account created successfully! Please sign in.';
 
         // After success, switch to sign-in form and pre-fill email
@@ -168,12 +187,19 @@ export class SignInSignUpComponent implements OnInit {
         this.signInData.email = response.email || this.signUpData.email; // Pre-fill email from response or input
         this.signInData.password = ''; // Clear password
         this.clearSignUpErrors(); // Clear sign-up errors
+        this.employeeDetailsFetched = false; // NEW: Reset read-only state on successful signup
       },
       error: (errorRes: HttpErrorResponse) => {
         console.error('Sign up failed:', errorRes);
         this.clearSignUpErrors(); // Clear previous sign-up errors
         if (errorRes.error && typeof errorRes.error === 'object') {
-          this.signUpErrors = errorRes.error;
+          // Backend might send field-specific error in 'error' property of error.error
+          if (errorRes.error.error && typeof errorRes.error.error === 'object') {
+            this.signUpErrors = errorRes.error.error;
+          } else {
+            // General error message if no specific field is identified
+            this.signUpErrors.nonFieldErrors = errorRes.error?.error || errorRes.error?.message || 'Sign up failed. Please try again.';
+          }
         } else {
           this.signUpErrors.nonFieldErrors = errorRes.error?.error || errorRes.error?.message || 'Sign up failed. Please try again.';
         }
@@ -249,7 +275,74 @@ export class SignInSignUpComponent implements OnInit {
     });
   }
 
-  // Helper methods to clear messages and specific error objects
+  /**
+   * Handles fetching employee details when the "Fetch Details" button is clicked.
+   * Renamed from onEmployeeIdChange to onFetchEmployeeDetails for clarity.
+   */
+  onFetchEmployeeDetails(): void {
+    this.clearSignUpErrors(); // Clear any existing signup errors related to employeeId or other fields
+    this.errorMessage = null; // Clear general error messages
+    this.successMessage = null; // Clear success messages
+    this.employeeDetailsFetched = false; // NEW: Reset read-only state before trying to fetch again
+
+    if (this.signUpData.employeeId === null || this.signUpData.employeeId.toString().trim() === '') {
+      this.signUpErrors.employeeId = 'Please enter an Employee ID before fetching details.';
+      this.resetSignUpFormFieldsForPreFill(); // Clear pre-filled fields if employee ID is empty
+      return;
+    }
+
+    const employeeIdNum = Number(this.signUpData.employeeId);
+    if (isNaN(employeeIdNum) || employeeIdNum <= 0) {
+      this.signUpErrors.employeeId = 'Please enter a valid Employee ID (a positive number).';
+      this.resetSignUpFormFieldsForPreFill();
+      return;
+    }
+
+    this.isFetchingEmployeeDetails = true; // Show loading indicator
+    this.authService.getEmployeeDetails(employeeIdNum).subscribe({
+      next: (details: EmployeeDetails) => {
+        this.signUpData.firstName = details.firstName;
+        this.signUpData.lastName = details.lastName;
+        this.signUpData.email = details.email;
+        // Uncomment if your backend EmployeeDetailsDTO includes these fields
+        // this.signUpData.department = details.department || '';
+        // this.signUpData.jobTitle = details.jobTitle || '';
+        this.isFetchingEmployeeDetails = false;
+        this.successMessage = 'Employee details loaded successfully!';
+        this.employeeDetailsFetched = true; // NEW: Set to true on successful fetch
+      },
+      error: (errorRes: HttpErrorResponse) => {
+        this.isFetchingEmployeeDetails = false;
+        this.employeeDetailsFetched = false; // NEW: Ensure it's false on error
+        console.error('Error fetching employee details:', errorRes);
+        this.resetSignUpFormFieldsForPreFill(); // Clear fields on error
+
+        if (errorRes.error && typeof errorRes.error === 'string') {
+          this.signUpErrors.nonFieldErrors = errorRes.error; // Backend sends a direct string error
+        } else if (errorRes.error && typeof errorRes.error === 'object' && errorRes.error.message) {
+          this.signUpErrors.nonFieldErrors = errorRes.error.message; // Standard message from backend
+        } else if (errorRes.error && typeof errorRes.error === 'object' && errorRes.error.error) {
+           this.signUpErrors.nonFieldErrors = errorRes.error.error; // Custom 'error' field
+        }
+        else {
+          this.signUpErrors.nonFieldErrors = 'Could not fetch employee details. Please check the ID and try again.';
+        }
+        this.successMessage = null; // Clear any previous success message on error
+      }
+    });
+  }
+
+  // Helper method to reset relevant signup form fields AND the read-only state
+  private resetSignUpFormFieldsForPreFill(): void {
+    this.signUpData.firstName = '';
+    this.signUpData.lastName = '';
+    this.signUpData.email = '';
+    // If you uncommented department/jobTitle for pre-fill, reset them here too
+    // this.signUpData.department = '';
+    // this.signUpData.jobTitle = '';
+    this.employeeDetailsFetched = false; // NEW: Ensure fields are editable again if reset
+  }
+
   private clearAllMessagesAndErrors(): void {
     this.errorMessage = null;
     this.successMessage = null;
@@ -257,6 +350,7 @@ export class SignInSignUpComponent implements OnInit {
     this.clearSignUpErrors();
     this.clearForgotPasswordErrors();
     this.clearResetPasswordErrors();
+    this.employeeDetailsFetched = false; // NEW: Clear read-only state when clearing all
   }
 
   private clearSignInErrors(): void {

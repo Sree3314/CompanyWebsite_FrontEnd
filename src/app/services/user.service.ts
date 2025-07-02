@@ -1,42 +1,45 @@
-// src/app/services/user.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs'; 
+import { EmployeeDetails } from '../models/auth.model'; // Import the new interface
 
-// Define the interface for the UserProfileResponse DTO from your backend
-// Ensure this matches the structure of com.example.MainProject.dto.UserProfileResponse
+// Assuming these exist for profile management
 export interface UserProfileResponse {
-  employeeId: number; // Assuming employeeId is a number
+  employeeId: number;
   firstName: string;
   lastName: string;
   email: string;
   contactInformation: string;
   department: string;
   jobTitle: string;
-  profilePictureUrl: string; 
-  role:string;// Optional field
-  // Add other properties if your DTO has them
+  profilePictureUrl?: string;
+  // Add any other user profile fields
 }
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8089/api/users'; // Base API URL for user-related endpoints
+  private userApiUrl = `http://localhost:8089/api/users`; // Assuming user-related endpoints
+  private employeeApiUrl = `http://localhost:8089/api/employees`; // NEW: Dedicated endpoint for general employee data
 
   constructor(private http: HttpClient) { }
 
-  /**
-   * Fetches the profile of the currently authenticated user.
-   * The AuthInterceptor will automatically add the JWT token to this request.
-   * @returns An Observable of the UserProfileResponse.
-   */
+  // Existing: Fetches the current authenticated user's profile
   getUserProfile(): Observable<UserProfileResponse> {
-    return this.http.get<UserProfileResponse>(`${this.apiUrl}/me`);
+    return this.http.get<UserProfileResponse>(`${this.userApiUrl}/me`);
   }
-    updateUserProfile(userProfile: UserProfileResponse): Observable<UserProfileResponse> {
-      // The backend expects a PUT request to /api/users/me
-      return this.http.put<UserProfileResponse>(`${this.apiUrl}/me`, userProfile);
-    }
+
+  // Existing: Updates the current authenticated user's profile
+  updateUserProfile(profileData: UserProfileResponse): Observable<UserProfileResponse> {
+    return this.http.put<UserProfileResponse>(`${this.userApiUrl}/me`, profileData);
   }
+
+  // --- NEW: Method to fetch employee details by ID ---
+  // This will be called from the SignupComponent
+  getEmployeeDetailsById(employeeId: number): Observable<EmployeeDetails> {
+    // Make sure your backend has an endpoint like /api/employees/{employeeId}
+    return this.http.get<EmployeeDetails>(`${this.employeeApiUrl}/${employeeId}`);
+  }
+}

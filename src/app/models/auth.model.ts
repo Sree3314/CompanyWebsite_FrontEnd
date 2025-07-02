@@ -4,9 +4,6 @@ export interface SignInRequest {
   password: string;
 }
   
-  
- 
-
 
 export interface SignInResponse {
   jwtToken: string;
@@ -17,7 +14,7 @@ export interface SignInResponse {
 }
 
 export interface SignUpRequest {
-  employeeId: string;
+  employeeId: number;
   firstName: string;
   lastName: string;
   email: string;
@@ -40,4 +37,34 @@ export interface MessageResponse {
   error?: string;   // Optional for success, required for error
   email?: string;   // Useful for register success to show email
   employeeId?: string; // Useful for register success to show employeeId
+}
+
+// --- NEW INTERFACE FOR FETCHED EMPLOYEE DETAILS ---
+export interface EmployeeDetails {
+  employeeId: number;
+  firstName: string;
+  lastName: string;
+  email: string; // This is the organizational email from HR system
+  // Add other fields here if your backend will provide them when fetching by ID
+  // e.g., department, jobTitle, if they are also pre-filled.
+  // For now, let's assume only firstName, lastName, email are fetched.
+}
+
+
+export interface AuthResponse {
+  jwt: string;
+  email: string;
+  roles: string[];
+  employeeId: number; // Ensure this is present if your backend AuthResponse includes it
+}
+
+// --- NEW: Interface for Employee Details DTO ---
+export interface EmployeeDetails {
+  employeeId: number;
+  firstName: string;
+  lastName: string;
+  email: string; // This is the organizational email
+  // Add other fields if your backend EmployeeDetailsDTO includes them
+  // department?: string;
+  // jobTitle?: string;
 }

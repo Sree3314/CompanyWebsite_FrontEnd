@@ -1,11 +1,11 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of, tap, BehaviorSubject } from 'rxjs';
+import { HttpClient,HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, tap, BehaviorSubject,throwError } from 'rxjs';
 import { Router } from '@angular/router';
  import {jwtDecode} from 'jwt-decode'; // Ensure you have jwt-decode installed: npm install jwt-decode
-import { SignInRequest, SignInResponse, SignUpRequest ,MessageResponse,ResetPasswordRequest} from '../models/auth.model';
- 
+import { SignInRequest, SignInResponse, SignUpRequest ,MessageResponse,ResetPasswordRequest,EmployeeDetails} from '../models/auth.model';
+import { catchError } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
@@ -27,13 +27,32 @@ export class AuthService {
     private http: HttpClient,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {
+  )
+  
+  {
     this._isLoggedIn$ = new BehaviorSubject<boolean>(this.hasTokenInLocalStorage());
     this.isLoggedIn$ = this._isLoggedIn$.asObservable();
  
     this.loadUserFromLocalStorage();
   }
- 
+  private handleError = (error: HttpErrorResponse) => {
+    let errorMessage = 'An unknown error occurred!';
+    if (error.error instanceof ErrorEvent) {
+      // Client-side errors
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Backend errors
+      console.error(`Backend returned code ${error.status}, body was: ${error.error}`);
+      if (error.error && typeof error.error === 'object' && error.error.error) {
+          errorMessage = error.error.error; // Assuming 'error' field exists for custom messages
+      } else if (error.error && typeof error.error === 'string') {
+          errorMessage = error.error; // Direct string error message
+      } else if (error.message) {
+          errorMessage = error.message; // Fallback to HTTP error message
+      }
+    }
+    return throwError(() => new Error(errorMessage));
+  }
   private hasTokenInLocalStorage(): boolean {
     if (isPlatformBrowser(this.platformId)) {
       return !!localStorage.getItem(this.TOKEN_KEY);
@@ -245,7 +264,11 @@ export class AuthService {
       return null;
     }
   }
-  
+  getEmployeeDetails(employeeId: number): Observable<EmployeeDetails> {
+    return this.http.get<EmployeeDetails>(`http://localhost:8089/api/users/employee-details/${employeeId}`).pipe(
+      catchError(this.handleError)
+    );
+  }
 }
  
  

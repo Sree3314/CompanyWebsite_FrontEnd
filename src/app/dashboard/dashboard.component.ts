@@ -48,6 +48,9 @@ export class DashboardComponent implements OnInit {
   showDeleteConfirmation: boolean = false;
   uploadToDeleteId: number | null = null; // Assuming uploadId is a number
  
+  // NEW: Property to track if the current user is a manager
+  isManager: boolean = false;
+ 
   constructor(
     private userService: UserService,
     private authService: AuthService,
@@ -57,6 +60,11 @@ export class DashboardComponent implements OnInit {
  
   ngOnInit(): void {
     this.fetchUserDetails();
+    // FIX: Check for 'MANAGER' (without ROLE_ prefix) as sent by your backend and provided by AuthService
+    this.authService.getCurrentUserRoles().subscribe(roles => {
+      this.isManager = roles.includes('MANAGER'); // Changed from 'ROLE_MANAGER' to 'MANAGER'
+      console.log('DashboardComponent: User roles:', roles, 'Is Manager:', this.isManager);
+    });
   }
  
   fetchUserDetails(): void {
@@ -139,6 +147,13 @@ export class DashboardComponent implements OnInit {
   }
  
   uploadAchievements(): void {
+    // NEW: Prevent managers from accessing this
+    if (this.isManager) {
+      this.errorMessage = 'Managers cannot upload achievements.';
+      this.successMessage = null;
+      setTimeout(() => this.errorMessage = null, 5000);
+      return;
+    }
     this.showUploadForm = true;
     this.showMyUploads = false;
     this.editMode = false;
@@ -158,6 +173,14 @@ export class DashboardComponent implements OnInit {
   }
  
   submitUpload(): void {
+    // NEW: Prevent managers from submitting uploads
+    if (this.isManager) {
+      this.errorMessage = 'Managers cannot submit uploads.';
+      this.successMessage = null;
+      setTimeout(() => this.errorMessage = null, 5000);
+      return;
+    }
+ 
     if (!this.userDetails?.employeeId) {
       this.errorMessage = 'User employee ID not available. Cannot upload.';
       return;
@@ -205,6 +228,13 @@ export class DashboardComponent implements OnInit {
   }
  
   viewMyUploads(): void {
+    // NEW: Prevent managers from accessing this
+    if (this.isManager) {
+      this.errorMessage = 'Managers cannot view their own uploads.';
+      this.successMessage = null;
+      setTimeout(() => this.errorMessage = null, 5000);
+      return;
+    }
     this.showMyUploads = true;
     this.showUploadForm = false;
     this.editMode = false;
@@ -214,6 +244,14 @@ export class DashboardComponent implements OnInit {
   }
  
   fetchMyUploads(): void {
+    // NEW: Prevent managers from fetching their own uploads
+    if (this.isManager) {
+      this.errorMessage = 'Managers cannot fetch their own uploads.';
+      this.successMessage = null;
+      setTimeout(() => this.errorMessage = null, 5000);
+      return;
+    }
+ 
     this.myUploads = [];
     this.uploadService.getMyUploads().subscribe({
       next: (data) => {
@@ -237,6 +275,14 @@ export class DashboardComponent implements OnInit {
  
   // --- Delete Method ---
   deleteUpload(uploadId: number): void { // Changed type to number to match your upload.model.ts
+    // NEW: Prevent managers from deleting their own uploads (they can delete others via ExhibitionController)
+    if (this.isManager) {
+      this.errorMessage = 'Managers cannot delete uploads from this section.';
+      this.successMessage = null;
+      setTimeout(() => this.errorMessage = null, 5000);
+      return;
+    }
+ 
     if (confirm('Are you sure you want to delete this upload? This action cannot be undone.')) {
       this.uploadService.deleteUpload(uploadId).subscribe({
         next: () => {

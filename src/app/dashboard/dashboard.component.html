@@ -1,5 +1,3 @@
-
-
 <div class="dashboard-container min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-sans relative flex justify-center items-start py-10">
  
   <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col md:flex-row text-center transform transition-transform duration-300 hover:scale-[1.005]">
@@ -7,13 +5,13 @@
     <div class="md:w-1/3 flex flex-col items-center md:items-start p-4 border-b md:border-b-0 md:border-r border-gray-200 mb-6 md:mb-0 md:pr-8">
       <div class="relative mb-6">
         <img *ngIf="userDetails?.profilePictureUrl && userDetails; else defaultProfile"
-             [src]="userDetails.profilePictureUrl"
-             alt="Profile"
-             class="w-32 h-32 rounded-full object-cover shadow-lg border-4 border-white transform transition-transform duration-300 hover:scale-105">
+              [src]="userDetails.profilePictureUrl"
+              alt="Profile"
+              class="w-32 h-32 rounded-full object-cover shadow-lg border-4 border-white transform transition-transform duration-300 hover:scale-105">
         <ng-template #defaultProfile>
           <img src="./assets/images/profile.png"
-               alt="Default Profile"
-               class="w-32 h-32 rounded-full object-cover shadow-lg border-4 border-white transform transition-transform duration-300 hover:scale-105">
+                alt="Default Profile"
+                class="w-32 h-32 rounded-full object-cover shadow-lg border-4 border-white transform transition-transform duration-300 hover:scale-105">
         </ng-template>
       </div>
       <!-- Removed optional chaining as userDetails is guaranteed by outer *ngIf -->
@@ -28,11 +26,13 @@
                 class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-75">
           Edit Profile
         </button>
-        <button (click)="uploadAchievements()"
+        <!-- NEW: Conditionally display "Upload Achievements" button -->
+        <button *ngIf="!isManager" (click)="uploadAchievements()"
                 class="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75">
           Upload Achievements
         </button>
-        <button (click)="viewMyUploads()"
+        <!-- NEW: Conditionally display "View My Uploads" button -->
+        <button *ngIf="!isManager" (click)="viewMyUploads()"
                 class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75">
           View My Uploads
         </button>
@@ -114,6 +114,7 @@
               <p class="text-lg text-gray-700">
                 <strong class="text-indigo-600 block text-sm font-medium mb-1">Job Title:</strong>
                 <span *ngIf="!editMode" class="bg-gray-50 p-2 rounded-md block">{{ user.jobTitle }}</span>
+                
                 <input *ngIf="editMode && editableUserDetails" [(ngModel)]="editableUserDetails.jobTitle"
                        class="border border-gray-300 rounded-md px-3 py-2 w-full focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition duration-200">
               </p>
@@ -140,7 +141,8 @@
         </ng-template>
       </ng-container>
  
-      <div *ngIf="showUploadForm" class="upload-form-section flex-grow">
+      <!-- NEW: Conditionally display Upload Form section -->
+      <div *ngIf="showUploadForm && !isManager" class="upload-form-section flex-grow">
         <h3 class="text-2xl font-bold text-gray-800 mb-6">Upload Your Work / Achievement</h3>
         <p class="text-gray-600 text-center mb-6">Fill in the details below to upload your project or achievement.</p>
  
@@ -218,7 +220,8 @@
         </form>
       </div>
  
-      <div *ngIf="showMyUploads" class="my-uploads-section flex-grow">
+      <!-- NEW: Conditionally display My Uploads section -->
+      <div *ngIf="showMyUploads && !isManager" class="my-uploads-section flex-grow">
         <h3 class="text-2xl font-bold text-gray-800 mb-6">My Uploaded Works</h3>
         <p class="text-gray-600 text-center mb-6" *ngIf="myUploads.length > 0">Here are all your uploaded projects and achievements.</p>
         <p class="text-gray-600 text-center mb-6" *ngIf="myUploads.length === 0 && !errorMessage">You haven't uploaded any works yet.</p>
@@ -230,7 +233,7 @@
                     class="absolute top-2 right-2 text-red-500 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-300 rounded-full p-1"
                     title="Delete this upload">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 0 00-1 1v3M4 7h16"></path>
               </svg>
             </button>
  
