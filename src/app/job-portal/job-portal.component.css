@@ -1,4 +1,6 @@
-General container for the job portal
+/* jobportal-component.css */
+
+/* General container for the job portal */
 .job-portal-container {
   padding: 20px;
   max-width: 1200px;
@@ -8,6 +10,9 @@ General container for the job portal
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Stronger shadow */
   font-family: 'Inter', sans-serif;
   color: #333; /* Default text color */
+  flex: 1; /* CRITICAL: Allows this container to grow and push elements below it within its parent (app-root/router-outlet) */
+  display: flex;
+  flex-direction: column; /* This is crucial for its children to stack and grow vertically */
 }
 
 /* New: Stylish Navigation Bar */
@@ -22,6 +27,7 @@ General container for the job portal
   padding: 15px 25px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0; /* Important: Prevents nav from shrinking or taking up excess space */
 }
 
 .nav-section {
@@ -80,8 +86,15 @@ General container for the job portal
 }
 
 /* Job List and Application List Containers */
-.jobs-list-container, .applications-list-container, .my-applications-list-container {
-  padding: 20px;
+/* THESE ARE THE KEY ELEMENTS THAT NEED TO GROW WITHIN .job-portal-container */
+.jobs-list-container,
+.applications-list-container,
+.my-applications-list-container,
+.job-post-form {
+  padding: 20px; /* Corrected padding value */
+  flex-grow: 1; /* CRITICAL: Makes the content area expand within .job-portal-container */
+  display: flex; /* These must also be flex containers */
+  flex-direction: column; /* So their internal content can stack and push if needed */
   /* margin-top is now handled by .card-layout where applicable */
 }
 
@@ -93,6 +106,7 @@ General container for the job portal
   flex-wrap: wrap; /* Allow wrapping on smaller screens */
   margin-bottom: 30px; /* Space below the header area */
   padding: 0 10px; /* Some padding for alignment */
+  flex-shrink: 0; /* Prevent header from shrinking */
 }
 
 .section-header h2 {
@@ -110,6 +124,7 @@ General container for the job portal
   max-width: 400px; /* Limit width */
   margin-left: 20px; /* Space between heading and search bar */
   position: relative; /* For potential icon positioning */
+  flex-shrink: 0;
 }
 
 .search-input {
@@ -144,6 +159,7 @@ General container for the job portal
   gap: 25px; /* Space between cards */
   list-style: none;
   padding: 0;
+  flex-grow: 1; /* Allow the grid itself to grow if its content is short */
 }
 
 .job-card, .application-card {
@@ -470,7 +486,7 @@ hr {
   border-radius: 4px;
 }
 
-/* Role hint small text (should have been removed in HTML already) */
+/* Role hint small text */
 .role-hint {
   margin-top: 15px;
   padding: 10px;
@@ -482,95 +498,94 @@ hr {
   font-style: italic;
 }
 
-
 /* Responsive adjustments */
 @media (max-width: 992px) { /* Tablets and smaller laptops */
   .grid-container {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjust min width for smaller screens */
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjust min width for smaller screens */
   }
   .section-header {
-    flex-direction: column; /* Stack heading and search bar vertically */
-    align-items: flex-start; /* Align items to the start */
-    margin-bottom: 20px;
+      flex-direction: column; /* Stack heading and search bar vertically */
+      align-items: flex-start; /* Align items to the start */
+      margin-bottom: 20px;
   }
   .section-header h2 {
-    width: 100%; /* Take full width */
-    text-align: center; /* Center heading on smaller screens */
-    margin-bottom: 15px; /* Add space below heading */
+      width: 100%; /* Take full width */
+      text-align: center; /* Center heading on smaller screens */
+      margin-bottom: 15px; /* Add space below heading */
   }
   .search-bar-container {
-    margin-left: 0; /* Remove left margin when stacked */
-    max-width: 100%; /* Allow search bar to take full width */
+      margin-left: 0; /* Remove left margin when stacked */
+      max-width: 100%; /* Allow search bar to take full width */
   }
 }
 
 @media (max-width: 768px) { /* Tablets and mobile */
   .job-portal-container {
-    padding: 15px;
-    margin: 10px auto;
+      padding: 15px;
+      margin: 10px auto;
   }
 
   .main-nav {
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px;
   }
 
   .nav-section {
-    flex-direction: column;
-    width: 100%;
-    gap: 10px;
+      flex-direction: column;
+      width: 100%;
+      gap: 10px;
   }
 
   .nav-button {
-    width: 100%;
-    font-size: 0.95em;
-    padding: 10px 15px;
+      width: 100%;
+      font-size: 0.95em;
+      padding: 10px 15px;
   }
 
   .btn {
-    width: 100%; /* Full width buttons on small screens */
-    margin-bottom: 10px;
+      width: 100%; /* Full width buttons on small screens */
+      margin-bottom: 10px;
   }
 
   .manager-actions, .user-actions, .top-actions-bar {
-    flex-direction: column; /* Stack buttons/sections vertically */
+      flex-direction: column; /* Stack buttons/sections vertically */
   }
 
   .job-card, .application-card {
-    padding: 15px;
-    min-height: auto; /* Allow height to adjust */
+      padding: 15px;
+      min-height: auto; /* Allow height to adjust */
   }
 
   .modal-content {
-    padding: 25px;
-    width: 95%;
+      padding: 25px;
+      width: 95%;
   }
 
   .modal-content h2 {
-    font-size: 1.6em;
+      font-size: 1.6em;
   }
 
   .close-button {
-    font-size: 30px;
-    top: 15px;
-    right: 15px;
+      font-size: 30px;
+      top: 15px;
+      right: 15px;
   }
 }
 
 @media (max-width: 480px) { /* Smaller mobile devices */
   .job-portal-container {
-    padding: 10px;
+      padding: 10px;
   }
   .job-card h3, .application-card h3 {
-    font-size: 1.4em;
+      font-size: 1.4em;
   }
   .modal-content {
-    padding: 20px;
+      padding: 20px;
   }
   .close-button {
-    font-size: 28px;
-    top: 10px;
-    right: 10px;
+      font-size: 28px;
+      top: 10px;
+      right: 10px;
   }
 }
